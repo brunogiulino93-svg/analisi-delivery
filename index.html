@@ -667,7 +667,7 @@ ol.reg li.annullata .reg-r2 { text-decoration: line-through; }
           <summary>Cosa fa questo prototipo</summary>
           <p>Tre ruoli con accesso simulato. Il master modifica tutto: simboli, nomi dei layer e dei campi, elenchi, utenti e permessi, oltre ai dati. Gli assistenti modificano quartine, classificazioni, note e squadre delle WR, e possono spostare e associare WR alle PTE. Le squadre vedono solo le proprie WR e segnano se l'impianto è fatto o no.</p>
           <p>Ogni modifica finisce nel registro (chi, quando, prima e dopo) e il master può annullarla. Impostazioni e modifiche restano in questo browser: con il server saranno condivise.</p>
-          <p>La ricerca segue le regole della v1.8.3: civici PNRR prima dei NO PNRR, numeri civici per intero, codici prima uguali e poi parziali, zoom non oltre 1:1.500.</p>
+          <p>La ricerca segue le regole della v1.8.3: civici PNRR prima dei NO PNRR, numeri civici per intero, codici prima uguali e poi parziali, zoom non oltre 1:1.500. La modalit\u00e0 Coordinate accetta decimali, gradi/primi/secondi e link di Google Maps.</p>
         </details>
       </div>
     </div>
@@ -772,21 +772,24 @@ var MODI = [
   { id: "COMUNE", label: "Comune" },
   { id: "WR", label: "WR" },
   { id: "CLLI", label: "CLLI" },
-  { id: "EGON", label: "EGON" }
+  { id: "EGON", label: "EGON" },
+  { id: "COORD", label: "Coordinate" }
 ];
 var ESEMPI = {
   INDIRIZZO: "es. via roma 12 tollo",
   COMUNE: "nome del comune, anche parziale",
   WR: "codice WR, anche pi\u00f9 codici",
   CLLI: "CLLI della PTE, anche parziale",
-  EGON: "codice EGON del civico, anche pi\u00f9 codici"
+  EGON: "codice EGON del civico, anche pi\u00f9 codici",
+  COORD: "es. 42.3512, 14.1675"
 };
 var AIUTO = {
   INDIRIZZO: "Civici PNRR e poi NO PNRR. Le parole valgono anche a pezzi, i numeri per intero: 19, 19/A, 19 BIS, N. 19.",
   COMUNE: "Zoom sul territorio dei civici del comune, senza selezione. Pi\u00f9 comuni separati da virgola o punto e virgola.",
   WR: "Campo WR dei layer PRE_ANALISI_WR. Pi\u00f9 codici separati da spazio, virgola o punto e virgola.",
   CLLI: "Campo CLLI_CODE delle STRUCTURE. Prima i codici uguali, se non ce ne sono quelli che lo contengono.",
-  EGON: "Campo EGON dei civici, PNRR e NO PNRR. Zeri davanti e decimali non contano."
+  EGON: "Campo EGON dei civici, PNRR e NO PNRR. Zeri davanti e decimali non contano.",
+  COORD: "Latitudine e longitudine WGS84: decimali (42.3512, 14.1675), gradi primi secondi (42\u00b021'04\"N 14\u00b010'03\"E) oppure un link di Google Maps. Zoom 1:1.500 con banner sul punto."
 };
 
 // =====================================================================
@@ -3092,10 +3095,107 @@ function cercaComune(testo) {
   };
 }
 
+
+// =====================================================================
+// RICERCA PER COORDINATE (decimali, gradi/primi/secondi, link Google Maps)
+// =====================================================================
+function _numCoord(t) { return parseFloat(String(t).replace(",", ".")); }
+function _coordValide(lat, lon) {
+  return isFinite(lat) && isFinite(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180;
+}
+// se l'ordine sembra invertito (lon, lat) lo raddrizza: vale per l'Italia e dintorni
+function _raddrizzaCoord(a, b) {
+  if (Math.abs(a) > 90 && Math.abs(b) <= 90) return [b, a];
+  if (a >= 6 && a <= 19 && b >= 35 && b <= 48) return [b, a];
+  return [a, b];
+}
+// una singola quota in gradi: 42, 42.35, 42\u00b021'04", 42\u00b021.07', con emisfero prima o dopo
+var _RX_DMS = /([NSEWO])?\s*([+-]?\d+(?:[.,]\d+)?)\s*(?:\u00b0|\u00ba|d|\u02da)\s*(?:(\d+(?:[.,]\d+)?)\s*(?:'|\u2032|\u2019|\u00b4|`|m)\s*)?(?:(\d+(?:[.,]\d+)?)\s*(?:"|\u2033|\u201d|''|\u2019\u2019|s)\s*)?([NSEWO])?/gi;
+function _parseDms(t) {
+  var q = [], m;
+  _RX_DMS.lastIndex = 0;
+  while ((m = _RX_DMS.exec(t)) !== null) {
+    var gr = _numCoord(m[2]), pr = m[3] ? _numCoord(m[3]) : 0, se = m[4] ? _numCoord(m[4]) : 0;
+    var neg = gr < 0 || /^-/.test(m[2]);
+    var v = Math.abs(gr) + pr / 60 + se / 3600;
+    var em = (m[5] || m[1] || "").toUpperCase();
+    if (em === "S" || em === "W" || em === "O") neg = true;
+    q.push({ v: neg ? -v : v, em: em });
+    if (q.length === 2) break;
+  }
+  if (q.length !== 2) return null;
+  var a = q[0], b = q[1];
+  // emisferi E/W scritti per primi: lon, lat
+  if ((a.em === "E" || a.em === "W" || a.em === "O") && (b.em === "N" || b.em === "S")) return [b.v, a.v];
+  return _raddrizzaCoord(a.v, b.v);
+}
+function _parseGoogle(t) {
+  var m;
+  // !3d<lat>!4d<lon> e' il punto del segnaposto, piu' preciso di @ (centro della vista)
+  if ((m = t.match(/!3d(-?\d+(?:\.\d+)?)!4d(-?\d+(?:\.\d+)?)/))) return [parseFloat(m[1]), parseFloat(m[2])];
+  if ((m = t.match(/[?&](?:q|ll|query|destination|center|daddr|saddr)=(?:loc:)?\+?(-?\d+(?:\.\d+)?)(?:,|%2C|\+|%20)\s*(-?\d+(?:\.\d+)?)/i))) return [parseFloat(m[1]), parseFloat(m[2])];
+  if ((m = t.match(/@(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/))) return [parseFloat(m[1]), parseFloat(m[2])];
+  if ((m = t.match(/\/place\/(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/))) return [parseFloat(m[1]), parseFloat(m[2])];
+  return null;
+}
+function parseCoordinate(testo) {
+  var t = clean(testo);
+  if (!t) return { err: "vuoto" };
+  var dec = t;
+  try { if (/%[0-9a-f]{2}/i.test(t)) dec = decodeURIComponent(t); } catch (e) { dec = t; }
+  if (/^https?:\/\//i.test(dec) || /(google\.[a-z.]+\/maps|goo\.gl|maps\.app)/i.test(dec)) {
+    var g = _parseGoogle(dec);
+    if (g && _coordValide(g[0], g[1])) return { lat: g[0], lon: g[1], da: "link Google Maps" };
+    if (/(goo\.gl|maps\.app)/i.test(dec))
+      return { err: "Il link breve di Google Maps non si pu\u00f2 leggere dal browser: apri il link, copia l'indirizzo completo dalla barra del browser (contiene @lat,lon) e incollalo qui." };
+    return { err: "Nel link non ci sono coordinate: apri il punto su Google Maps e copia l'indirizzo completo dalla barra del browser." };
+  }
+  if (/[\u00b0\u00ba\u02da]/.test(dec) || /\b\d+\s*d\s*\d/i.test(dec)) {
+    var d = _parseDms(dec);
+    if (d && _coordValide(d[0], d[1])) return { lat: d[0], lon: d[1], da: "gradi, primi, secondi" };
+    return { err: "Gradi, primi e secondi non leggibili. Esempio: 42\u00b021'04\"N 14\u00b010'03\"E" };
+  }
+  // decimali: due numeri, separatore virgola/punto e virgola/spazio, virgola decimale ammessa
+  var nums = dec.replace(/[NSEWO]\b/gi, function (x) { return " " + x + " "; }).match(/[+-]?\d+(?:[.,]\d+)?/g) || [];
+  if (nums.length === 1 && /[,;]/.test(dec)) nums = dec.split(/[,;]+/).map(function (x) { return x.trim(); }).filter(Boolean);
+  if (nums.length !== 2) return { err: "Servono due numeri (latitudine e longitudine), oppure gradi/primi/secondi, oppure un link di Google Maps." };
+  var a = _numCoord(nums[0]), b = _numCoord(nums[1]);
+  var emi = dec.toUpperCase().match(/[NSEWO]\b/g) || [];
+  if (emi.length === 2) {
+    if (emi[0] === "S" || emi[0] === "W" || emi[0] === "O") a = -Math.abs(a);
+    if (emi[1] === "S" || emi[1] === "W" || emi[1] === "O") b = -Math.abs(b);
+    if ((emi[0] === "E" || emi[0] === "W" || emi[0] === "O") && (emi[1] === "N" || emi[1] === "S")) { var tmp = a; a = b; b = tmp; }
+  }
+  var r = emi.length === 2 ? [a, b] : _raddrizzaCoord(a, b);
+  if (!_coordValide(r[0], r[1])) return { err: "Coordinate fuori intervallo (latitudine \u00b190, longitudine \u00b1180)." };
+  return { lat: r[0], lon: r[1], da: "decimali" };
+}
+function _fmtDms(v, pos, neg) {
+  var h = v < 0 ? neg : pos, a = Math.abs(v);
+  var g = Math.floor(a), mm = (a - g) * 60, m = Math.floor(mm), s = (mm - m) * 60;
+  s = Math.round(s * 100) / 100;
+  if (s >= 60) { s = 0; m += 1; }
+  if (m >= 60) { m = 0; g += 1; }
+  return g + "\u00b0" + (m < 10 ? "0" : "") + m + "'" + (s < 10 ? "0" : "") + s.toFixed(2).replace(/\.?0+$/, "") + "\"" + h;
+}
+function cercaCoordinate(testo) {
+  var c = parseCoordinate(testo);
+  if (c.err) { if (c.err !== "vuoto") avviso(c.err); return null; }
+  var ll = [c.lat, c.lon];
+  var dec = c.lat.toFixed(6) + ", " + c.lon.toFixed(6);
+  var fuori = c.lat < 35 || c.lat > 48 || c.lon < 6 || c.lon > 19;
+  vai(ll, zoomPerScala(CERCA_SCALA_PUNTO, c.lat));
+  aggiungiBanner("COORD " + c.lat.toFixed(5) + ", " + c.lon.toFixed(5), ll);
+  info("COORDINATE: " + dec + " (" + c.da + ")");
+  if (fuori) avviso("Il punto \u00e8 fuori dall'Italia: controlla l'ordine latitudine/longitudine.");
+  return { coord: { lat: c.lat, lon: c.lon, dec: dec, dms: _fmtDms(c.lat, "N", "S") + " " + _fmtDms(c.lon, "E", "W") }, meta: "1 punto" };
+}
+
 // cerca(): punto d'ingresso della barra di ricerca
 function cerca(testo, modo) {
   if (modo === "WR" || modo === "CLLI" || modo === "EGON") return cercaCodice(testo, modo);
   if (modo === "COMUNE") return cercaComune(testo);
+  if (modo === "COORD") return cercaCoordinate(testo);
   return cercaIndirizzo(testo);
 }
 
@@ -3136,6 +3236,20 @@ function mostraRisultati(r, modo) {
   var d = document.getElementById("btnDesel");
   if (d) d.onclick = function () { S.layers.forEach(function (L) { L.sel = new Set(); }); disegnaSelezione(); elRisMeta.textContent = r.meta || ""; };
   var h = "";
+  if (r.coord) {
+    h += '<div class="ris-gruppo"><ul class="ris-lista"><li><button class="ris-voce" type="button" id="btnCoordZoom"><span class="pt" style="border-radius:50%"></span><b>' +
+      esc(r.coord.dec) + "</b><small>" + esc(r.coord.dms) + "</small></button></li></ul>" +
+      '<p class="aiuto"><button class="lnk" type="button" id="btnCoordCopia">Copia coordinate</button></p></div>';
+    elRis.innerHTML = h;
+    document.getElementById("btnCoordZoom").onclick = function () { vai([r.coord.lat, r.coord.lon], zoomPerScala(CERCA_SCALA_PUNTO, r.coord.lat)); };
+    document.getElementById("btnCoordCopia").onclick = function () {
+      var b = this, t = r.coord.dec;
+      function fatto(x) { b.textContent = x; setTimeout(function () { b.textContent = "Copia coordinate"; }, 1600); }
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { fatto("Copiate"); }, function () { fatto("Non copiate"); });
+      else fatto("Non copiate");
+    };
+    return;
+  }
   if (r.comuni) {
     h += '<div class="ris-gruppo"><ul class="ris-lista">';
     r.comuni.forEach(function (c, i) {
@@ -3364,6 +3478,7 @@ document.getElementById("btnBanner").onclick = rimuoviBanner;
 var PROVE = {};
 function preparaProve() {
   PROVE = {};
+  PROVE.COORD = ["42.3512, 14.1675", "42\u00b021'04\"N 14\u00b010'03\"E", "https://www.google.com/maps/@42.3512,14.1675,17z"];
   if (!S.demo) return;
   var civ = S.layers.filter(function (L) { return L.kind === "CIVICI"; });
   var conBar = null, conNumVia = null, viaComune = null, egon = null;
