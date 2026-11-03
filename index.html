@@ -561,6 +561,32 @@ ol.reg li.annullata .reg-r2 { text-decoration: line-through; }
 .pericolo-box small { color: var(--ink-3); font-size: 12px; }
 .btn.pericolo { background: var(--ko); border-color: var(--ko); color: #ffffff; }
 
+/* finestre */
+.dlg-box { width: min(700px, 100%); }
+.dlg-corpo { margin-top: 10px; font-size: 13.5px; color: var(--ink-2); }
+.dlg-corpo p { margin: 0 0 8px; }
+.dlg-pre { white-space: pre-wrap; font: inherit; font-size: 13px; line-height: 1.5; margin: 0 0 10px; padding: 10px 12px; background: var(--paper-2); border-radius: 7px; color: var(--ink); max-height: 46vh; overflow: auto; }
+.dlg-piede { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+.dlg-piede .btn { flex: none; min-width: 96px; }
+table.dlg-tab { width: 100%; border-collapse: collapse; font-size: 13px; margin: 6px 0 10px; }
+table.dlg-tab th { text-align: left; font-weight: 500; color: var(--ink-3); font-size: 12px; padding: 4px 8px 4px 0; border-bottom: 1px solid var(--rule); }
+table.dlg-tab td { padding: 6px 8px 6px 0; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+table.dlg-tab td small { color: var(--ink-3); font-size: 11.5px; }
+table.dlg-tab .n { text-align: right; }
+table.dlg-tab select { width: 100%; padding: 5px 7px; border: 1px solid var(--ink-3); border-radius: 5px; background: var(--paper); font-size: 13px; }
+.pill.nuovo { background: var(--accent); border-color: var(--banner-ink); color: var(--banner-ink); }
+.azioni + .azioni { margin-top: 8px; }
+.lnk[disabled] { opacity: .45; cursor: default; text-decoration: none; }
+
+/* velina catastale */
+.velina { margin-top: 12px; border-top: 1px solid var(--rule); padding-top: 6px; }
+.cat-ico { width: 16px; height: 12px; border: 1.5px solid var(--ink-2); border-radius: 2px; opacity: .75;
+  background: repeating-linear-gradient(90deg, transparent 0 5px, var(--ink-3) 5px 6px); }
+.velina-op { display: grid !important; grid-template-columns: auto 1fr 3.2em; gap: 8px; align-items: center; padding-left: 18px; }
+.velina-op input { width: 100%; accent-color: var(--ink); }
+.velina .aiuto { padding-left: 18px; }
+.ctl-sfondo button[data-cat] { border-left: 2px solid var(--ink); }
+
 @media (max-width: 760px) {
   .app { grid-template-columns: 1fr; grid-template-rows: minmax(0, 1fr) auto; }
   .panel { order: 2; border-right: 0; border-top: 1.5px solid var(--ink); max-height: 48vh; }
@@ -604,6 +630,13 @@ ol.reg li.annullata .reg-r2 { text-decoration: line-through; }
         <ul class="ris-lista" id="sqLista"></ul>
       </div>
 
+      <div class="blk" id="blkMbSq" hidden>
+        <div class="sez-tit"><h2>Impianti Montebello</h2><span class="meta" id="mbSqMeta"></span></div>
+        <div class="filtri" id="mbSqFiltri"></div>
+        <ul class="ris-lista" id="mbSqLista"></ul>
+        <div class="azioni sec"><button type="button" class="lnk" id="mbSqVisti">Segna tutti come visti</button><button type="button" class="lnk" id="mbSqExcel">Scarica Excel</button></div>
+      </div>
+
       <div class="blk" role="search">
         <div class="modi" role="radiogroup" aria-label="Cosa cercare" id="modi"></div>
         <div class="campo">
@@ -634,12 +667,26 @@ ol.reg li.annullata .reg-r2 { text-decoration: line-through; }
         </details>
       </div>
 
+      <div class="blk" id="blkMb" hidden>
+        <details open>
+          <summary class="sez-sum">Analisi Montebello</summary>
+          <div id="mbRiep"></div>
+          <div class="azioni"><button type="button" class="btn" id="mbEsporta">Esporta Excel</button><button type="button" class="btn" id="mbSquadre">Excel per squadra</button></div>
+        </details>
+      </div>
+
       <div class="blk">
         <div class="sez-tit">
           <h2>Layer</h2>
           <span class="meta num" id="layMeta"></span>
         </div>
         <div id="layer"></div>
+        <details class="lay-gruppo velina" id="velina">
+          <summary><span class="freccia">&#9656;</span><input type="checkbox" id="catOn" aria-label="Mostra la velina catastale"><span>Velina catastale</span></summary>
+          <div id="catLivelli"></div>
+          <label class="opz velina-op"><span>Opacità</span><input type="range" id="catOpacita" min="0.2" max="1" step="0.05" value="0.85"><span class="num" id="catOpVal"></span></label>
+          <p class="aiuto" id="catNota"></p>
+        </details>
         <label class="opz"><input type="checkbox" id="optScala" checked> <span id="optScalaTxt">Visibilità in scala</span></label>
       </div>
 
@@ -649,6 +696,10 @@ ol.reg li.annullata .reg-r2 { text-decoration: line-through; }
         <div class="azioni">
           <button class="btn btn-pri" id="btnCartella" type="button">Cartella RESA DELIVERY</button>
           <button class="btn" id="btnPre" type="button">Pre-analisi WR</button>
+        </div>
+        <div class="azioni">
+          <button class="btn" id="btnMb" type="button">Analisi Montebello</button>
+          <button class="btn" id="btnSt" type="button">STRUCTURE dal proforma</button>
         </div>
         <div id="riepCartella"></div>
         <p class="piccolo" style="margin-top:8px">Tutto resta in questo browser: i dati si riaprono da soli alla prossima apertura e non vengono inviati da nessuna parte.</p>
@@ -660,14 +711,17 @@ ol.reg li.annullata .reg-r2 { text-decoration: line-through; }
         <input type="file" id="inCartella" webkitdirectory directory multiple hidden>
         <input type="file" id="inFile" multiple accept=".zip,.shp,.dbf,.prj,.cpg,.geojson,.json" hidden>
         <input type="file" id="inWr" multiple accept=".xlsx,.xlsm,.xls" hidden>
+        <input type="file" id="inMb" accept=".xlsx,.xlsm,.xls" hidden>
+        <input type="file" id="inSt" accept=".xlsx,.xlsm,.xls" hidden>
       </div>
 
       <div class="blk info">
         <details>
           <summary>Cosa fa questo prototipo</summary>
-          <p>Tre ruoli con accesso simulato. Il master modifica tutto: simboli, nomi dei layer e dei campi, elenchi, utenti e permessi, oltre ai dati. Gli assistenti modificano quartine, classificazioni, note e squadre delle WR, e possono spostare e associare WR alle PTE. Le squadre vedono solo le proprie WR e segnano se l'impianto è fatto o no.</p>
+          <p>Tre ruoli con accesso simulato. Il master modifica tutto: simboli, nomi dei layer e dei campi, elenchi, utenti e permessi, oltre ai dati. Gli assistenti modificano quartine, classificazioni, note e squadre delle WR, e possono spostare e associare WR alle PTE. Le squadre vedono solo le proprie WR e i propri impianti Montebello e segnano se l'impianto è fatto o no.</p>
           <p>Ogni modifica finisce nel registro (chi, quando, prima e dopo) e il master può annullarla. Impostazioni e modifiche restano in questo browser: con il server saranno condivise.</p>
-          <p>La ricerca segue le regole della v1.8.3: civici PNRR prima dei NO PNRR, numeri civici per intero, codici prima uguali e poi parziali, zoom non oltre 1:1.500. La modalit\u00e0 Coordinate accetta decimali, gradi/primi/secondi e link di Google Maps.</p>
+          <p>La ricerca segue le regole della v1.9.6 dello script: civici PNRR prima dei NO PNRR, numeri civici per intero, codici prima uguali e poi parziali, zoom non oltre 1:1.500. La modalità WR trova anche gli ordini Montebello. La modalità Coordinate accetta decimali, gradi/primi/secondi e link di Google Maps.</p>
+          <p>Dalla v1.9.6: analisi Montebello sull'export TIM degli appuntamenti (PTE più vicina contro ROE TIM, incrocio con il predelivery, Excel riesportato con le colonne dell'analisi e un Excel per squadra), STRUCTURE mancanti dal proforma PTE, velina catastale dell'Agenzia delle Entrate sopra lo sfondo. L'area QGISFO (disegno di SPAN, TRANSMEDIA e cavi con le stampe a tavole) resta nello script.</p>
         </details>
       </div>
     </div>
@@ -722,6 +776,13 @@ ol.reg li.annullata .reg-r2 { text-decoration: line-through; }
     <p class="acc-nota" id="accNota"></p>
   </div>
 </div>
+<div class="accesso" id="dlg" hidden>
+  <div class="acc-box dlg-box" role="dialog" aria-modal="true" aria-labelledby="dlgTit">
+    <div class="acc-testa"><div><h2 id="dlgTit"></h2></div><button type="button" class="chiudi" id="dlgChiudi" aria-label="Chiudi">&times;</button></div>
+    <div class="dlg-corpo" id="dlgCorpo"></div>
+    <div class="dlg-piede" id="dlgPiede"></div>
+  </div>
+</div>
 <aside class="impostazioni monitor" id="monitor" aria-hidden="true" aria-label="Monitoraggio">
   <div class="imp-testa"><h2>Monitoraggio impianti</h2><button type="button" class="chiudi" id="monChiudi" aria-label="Chiudi">&times;</button></div>
   <div class="imp-corpo" id="monCorpo"></div>
@@ -740,11 +801,12 @@ ol.reg li.annullata .reg-r2 { text-decoration: line-through; }
 "use strict";
 
 // =====================================================================
-// CONFIG: stessi valori di ANALISI_DELIVERY v1.8.3
+// CONFIG: stessi valori di ANALISI_DELIVERY v1.9.6
 // =====================================================================
 var PREFIX_CIVICI = "CIVICI";
 var PREFIX_STRUCTURE = "STRUCTURE";
 var PRE_ANALISI_PREFIX = "PRE_ANALISI_WR";
+var MB_PREFIX = "ANALISI_MONTEBELLO", MB_PREFIX_COLL = "MONTEBELLO_COLLEGAMENTI", MB_PREFIX_ROE = "MONTEBELLO_ROE_TIM";
 var BLOCCHI_PREFIX = "BLOCCHI";
 var CAMPI_RICERCA = ["STRADA", "CIVICO", "BARRATO", "COMUNE", "PROVINCIA", "REGIONE"];
 var CAMPI_RICERCA_CIVICO = ["CIVICO", "BARRATO"];
@@ -786,7 +848,7 @@ var ESEMPI = {
 var AIUTO = {
   INDIRIZZO: "Civici PNRR e poi NO PNRR. Le parole valgono anche a pezzi, i numeri per intero: 19, 19/A, 19 BIS, N. 19.",
   COMUNE: "Zoom sul territorio dei civici del comune, senza selezione. Pi\u00f9 comuni separati da virgola o punto e virgola.",
-  WR: "Campo WR dei layer PRE_ANALISI_WR. Pi\u00f9 codici separati da spazio, virgola o punto e virgola.",
+  WR: "Campo WR dei layer PRE_ANALISI_WR e codice degli ordini ANALISI_MONTEBELLO. Pi\u00f9 codici separati da spazio, virgola o punto e virgola.",
   CLLI: "Campo CLLI_CODE delle STRUCTURE. Prima i codici uguali, se non ce ne sono quelli che lo contengono.",
   EGON: "Campo EGON dei civici, PNRR e NO PNRR. Zeri davanti e decimali non contano.",
   COORD: "Latitudine e longitudine WGS84: decimali (42.3512, 14.1675), gradi primi secondi (42\u00b021'04\"N 14\u00b010'03\"E) oppure un link di Google Maps. Zoom 1:1.500 con banner sul punto."
@@ -964,9 +1026,16 @@ function kindDaNome(nome) {
   if (u.indexOf(PREFIX_CIVICI) === 0) return "CIVICI";
   if (u.indexOf(PRE_ANALISI_PREFIX) === 0) return "WR";
   if (u.indexOf(BLOCCHI_PREFIX) === 0) return "BLOCCHI";
+  if (u.indexOf(MB_PREFIX) === 0) return "MB";
+  if (u.indexOf(MB_PREFIX_COLL) === 0) return "MB_COLL";
+  if (u.indexOf(MB_PREFIX_ROE) === 0) return "MB_ROE";
   if (u.indexOf("COLLEGAMENT") !== -1) return "COLLEGAMENTI";
   return "";
 }
+// tipi di layer a linee e ordine dei tipi nei gruppi
+var KIND_LINEA = { COLLEGAMENTI: true, MB_COLL: true, MB_ROE: true };
+function eLinea(k) { return !!KIND_LINEA[k]; }
+var ORDINE_KIND = { STRUCTURE: 0, CIVICI: 1, WR: 2, COLLEGAMENTI: 3, MB: 4, MB_COLL: 5, MB_ROE: 6, BLOCCHI: 7 };
 
 function nuovoLayer(o) {
   var L = {
@@ -1090,7 +1159,7 @@ var OPERATORI = [["=", "uguale a"], ["contiene", "contiene"], ["inizia", "inizia
 var CAMPO_TIPO_LAYER = "_TIPO_LAYER";
 var CAMPI_WR_IMPIANTO = ["IMPIANTO", "MOTIVO_NF", "NOTE_SQ", "DATA_IMP", "UTENTE_IMP"];
 var LISTA_PER_CAMPO = { CLASSIF: "classif", SQUADRA: "squadre", IMPIANTO: "impianto", MOTIVO_NF: "motivi" };
-var KINDS = ["STRUCTURE", "CIVICI", "WR", "COLLEGAMENTI", "BLOCCHI"];
+var KINDS = ["STRUCTURE", "CIVICI", "WR", "COLLEGAMENTI", "BLOCCHI", "MB", "MB_COLL", "MB_ROE"];
 var RUOLI = { master: "Master", assistente: "Assistente", squadra: "Squadra" };
 
 function cat(nome, regole, forma, colore, bordo, spessore, dim, extra) {
@@ -1107,7 +1176,7 @@ var SQUADRE_BASE = [
   ["SQ 08", "Gamma Fibra", "subappalto"], ["SQ 09", "Gamma Fibra", "subappalto"]
 ];
 var CONFIG_BASE = {
-  generale: { titolo: "Analisi Delivery", sottotitolo: "Prototipo web 0.5: mappa, ricerca, ruoli e accessi", chiaveArcgis: "" },
+  generale: { titolo: "Analisi Delivery", sottotitolo: "Prototipo web 0.6: mappa, ricerca, ruoli, Montebello e catasto", chiaveArcgis: "" },
   layers: {
     STRUCTURE: { nome: "Structure", scala: 60000, categorie: [
       cat("PTE con collaudo KO", [r("CLLI_CODE", "pieno"), r("STATO_COLL", "contiene", "KO")], "quadrato", "#e41a1c", "#ffffff", 1.2, 4.5, { etichetta: "TILABEL", evidenzia: copia(EVID_FATT) }),
@@ -1135,6 +1204,18 @@ var CONFIG_BASE = {
     ] },
     BLOCCHI: { nome: "Blocchi", scala: 0, categorie: [
       cat("Blocchi", [], "rombo", "#7b3294", "#ffffff", 1.4, 6)
+    ] },
+    MB: { nome: "Ordini Montebello", scala: 0, categorie: [
+      cat("KO", [r("CLASSIF", "=", "KO")], "quadrato", "#e41a1c", "#1c2834", 1.6, 5.5),
+      cat("Facile", [r("CLASSIF", "=", "FACILE")], "quadrato", "#4daf4a", "#1c2834", 1.6, 5.5),
+      cat("Complesso", [r("CLASSIF", "=", "COMPLESSO")], "quadrato", "#ff7f00", "#1c2834", 1.6, 5.5),
+      cat("Da classificare", [], "quadrato", "#ffffff", "#1c2834", 1.6, 5.5)
+    ] },
+    MB_COLL: { nome: "Montebello: PTE più vicina", scala: 0, categorie: [
+      cat("Collegamento alla PTE più vicina", [], "linea", "#00838f", "", 0, 1.6)
+    ] },
+    MB_ROE: { nome: "Montebello: ROE TIM diversa", scala: 0, categorie: [
+      cat("Verso la ROE TIM (diversa)", [], "linea", "#d50000", "", 0, 2.2, { tratteggio: true })
     ] }
   },
   nomiLayer: {},
@@ -1152,7 +1233,16 @@ var CONFIG_BASE = {
       ARM_KO: { alias: "Armadio non lavorato" }, ARM_ASSIST: { alias: "Assistente armadio" }, ARM_WEEK: { alias: "Week recupero" },
       PTE_FATT: { alias: "PTE fatturata" }, FATT_QTA: { alias: "Quantità fatturata" } },
     COLLEGAMENTI: { TILABEL_PT: { alias: "Quartina PTE" }, ID_PTE: { alias: "ID PTE" } },
-    BLOCCHI: { ID_CO: { alias: "Codice CO" }, BL_IMPRESA: { alias: "Impresa" }, TILABEL_PT: { alias: "Quartina PTE" } }
+    BLOCCHI: { ID_CO: { alias: "Codice CO" }, BL_IMPRESA: { alias: "Impresa" }, TILABEL_PT: { alias: "Quartina PTE" } },
+    MB: { WR: { alias: "ID ordine" }, ROE_TIM: { alias: "ROE TIM" }, PTE_DIV: { alias: "PTE diversa da ROE TIM" }, DIST_ROE_M: { alias: "Distanza ROE TIM (m)" },
+      IMP_ROE: { alias: "Impresa ROE TIM" }, LAVORAZ: { alias: "Tipo lavorazione" }, WR_WFM: { alias: "WR WFM" }, WR_PRED: { alias: "WR nel predelivery" },
+      WR_SQUADRA: { alias: "Squadra WR" }, WR_STATO: { alias: "Stato WR" }, WR_CLASSIF: { alias: "Classificazione WR" }, WR_NOTE: { alias: "Note WR" },
+      WR_PTE: { alias: "PTE WR" }, IMP_ATTIVO: { alias: "Impianto attivo" }, CLASSIF: { alias: "Classificazione" }, APPUNTAM: { alias: "Appuntamento" },
+      DISPACCIO: { alias: "Sottostato" }, TILABEL_PT: { alias: "Quartina PTE" }, ID_PTE: { alias: "PTE più vicina" }, DIST_PTE_M: { alias: "Distanza PTE (m)" },
+      TIPO_CIV: { alias: "Tipo civico" }, LAYER_CIV: { nascosto: true }, ARM_KO: { alias: "Armadio non lavorato" }, ARM_ASSIST: { alias: "Assistente armadio" },
+      ARM_WEEK: { alias: "Week recupero" }, PTE_FATT: { alias: "PTE fatturata" }, FATT_QTA: { alias: "Quantità fatturata" }, IMPRESA: { alias: "Impresa PTE" } },
+    MB_COLL: { WR: { alias: "ID ordine" }, TILABEL_PT: { alias: "Quartina PTE" }, ID_PTE: { alias: "PTE più vicina" } },
+    MB_ROE: { WR: { alias: "ID ordine" }, ROE_TIM: { alias: "ROE TIM" }, PTE_DIV: { alias: "PTE diversa da ROE TIM" } }
   },
   elenchi: {
     classif: ["KO", "FACILE", "COMPLESSO"],
@@ -1161,8 +1251,8 @@ var CONFIG_BASE = {
     squadre: SQUADRE_BASE.map(function (s) { return { codice: s[0], impresa: s[1], tipo: s[2], mail: "" }; })
   },
   permessi: {
-    assistente: { campi: { STRUCTURE: ["TILABEL"], WR: ["CLASSIF", "NOTE", "SQUADRA", "APPUNTAM"], BLOCCHI: ["CAUSALE"] },
-      sposta: { WR: true, STRUCTURE: true }, associa: true },
+    assistente: { campi: { STRUCTURE: ["TILABEL"], WR: ["CLASSIF", "NOTE", "SQUADRA", "APPUNTAM"], BLOCCHI: ["CAUSALE"], MB: ["CLASSIF", "NOTE"] },
+      sposta: { WR: true, STRUCTURE: true, MB: true }, associa: true },
     squadra: { campi: { WR: ["IMPIANTO", "MOTIVO_NF", "NOTE_SQ"] }, sposta: {}, associa: false }
   },
   utenti: [
@@ -1180,7 +1270,7 @@ function eMaster() { return ruolo() === "master"; }
 function compatta(s) { return normTxt(s).replace(/\s+/g, ""); }
 function permRuolo() { return CONFIG.permessi[ruolo()] || { campi: {}, sposta: {}, associa: false }; }
 function layerNascosto(L) { return ruolo() === "squadra" && L.kind === "BLOCCHI"; }
-function filtroAttivo(L) { return ruolo() === "squadra" && (L.kind === "WR" || L.kind === "COLLEGAMENTI"); }
+function filtroAttivo(L) { return ruolo() === "squadra" && (L.kind === "WR" || L.kind === "COLLEGAMENTI" || L.kind === "MB" || L.kind === "MB_COLL" || L.kind === "MB_ROE"); }
 var wrMieCache = null;
 function wrMie() {
   if (wrMieCache) return wrMieCache;
@@ -1195,6 +1285,8 @@ function wrMie() {
 function visibileFid(L, fid) {
   if (!filtroAttivo(L)) return true;
   if (L.kind === "WR") { var mia = compatta(S.utente.squadra || ""); return !!mia && compatta(val(L, fid, "SQUADRA")) === mia; }
+  if (L.kind === "MB") return mbMioOrdine(L, fid);
+  if (L.kind === "MB_COLL" || L.kind === "MB_ROE") return mbMie().has(val(L, fid, "WR").toUpperCase());
   return wrMie().has(val(L, fid, "WR"));
 }
 function puoModificare(L, fid, campo) {
@@ -1312,7 +1404,7 @@ function scriviValore(L, fid, c, v) {
   L.cache = {};
   var m = L.rendered.get(fid);
   if (m) { L.fg.removeLayer(m); L.rendered.delete(fid); }
-  if (L.kind === "WR") wrMieCache = null;
+  if (L.kind === "WR" || L.kind === "MB") { wrMieCache = null; mbMieCache = null; }
 }
 function nuovaRiga(L, row, linea) {
   L.rows.push(row);
@@ -1365,6 +1457,7 @@ function annullaOp(op) {
     var e = voci[i], L = layerDaChiave(e.lk, e.n0, e.lu);
     if (!L) { avviso("Il layer di questa modifica non è caricato: non si può annullare"); return; }
     if (e.c === "_NUOVA") continue;
+    if (voci.slice(i + 1).some(function (x) { return x.lu === e.lu && x.lk === e.lk && x.n0 === e.n0 && x.fid === e.fid && x.c === e.c; })) continue;
     if (!uguali(leggiValore(L, e.fid, e.c), e.d)) {
       avviso("Il valore è cambiato dopo questa modifica: annulla prima le modifiche più recenti");
       return;
@@ -1384,6 +1477,8 @@ function dopoModifica() {
   disegna();
   aggiornaSquadra();
   aggiornaAvanzamento();
+  aggiornaMbSquadra();
+  aggiornaMbBlocco();
   if (S.card) apriScheda(S.card.L, S.card.fid, S.card.altri);
   if (document.getElementById("impostazioni").classList.contains("aperta") && S.tabImp === "registro") disegnaImpostazioni();
 }
@@ -1470,7 +1565,7 @@ function apriScheda(L, fid, altri) {
   // strumenti
   var str = "";
   if (L.geom === "point" && puoSpostare(L)) str += '<button class="btn" type="button" data-str="sposta">Sposta</button>';
-  if (L.kind === "WR" && puoAssociare()) str += '<button class="btn" type="button" data-str="associa">Associa a PTE</button>';
+  if ((L.kind === "WR" || L.kind === "MB") && puoAssociare()) str += '<button class="btn" type="button" data-str="associa">Associa a PTE</button>';
   document.getElementById("cardStr").innerHTML = str;
   document.getElementById("cardStr").querySelectorAll("[data-str]").forEach(function (b) {
     b.onclick = function () { avviaStrumento(b.dataset.str, L, fid); };
@@ -1524,7 +1619,7 @@ function apriScheda(L, fid, altri) {
     });
     var op = nuovoOp(), n = modifica(L, fid, cambi, op);
     if (!n) { info("Nessun valore cambiato"); btnSalva.disabled = true; return; }
-    if (L.kind === "WR") sincronizzaCollegamento(L, fid, op);
+    if (L.kind === "WR" || L.kind === "MB") sincronizzaCollegamento(L, fid, op);
     salvaRegistro();
     info("Salvat" + (n === 1 ? "a 1 modifica" : "e " + n + " modifiche") + " su " + e[0]);
     dopoModifica();
@@ -1532,6 +1627,7 @@ function apriScheda(L, fid, altri) {
   document.getElementById("cardZoom").disabled = !haPos(L, fid);
   card.classList.add("aperta");
   evidenzia(L, fid);
+  if (L.kind === "MB" && ruolo() === "squadra" && mbSegnaVisti([[L, fid]])) aggiornaMbSquadra();
 }
 
 // =====================================================================
@@ -1560,10 +1656,11 @@ function distM(a, b) {
   var dx = (a[1] - b[1]) * 111320 * Math.cos(a[0] * Math.PI / 180), dy = (a[0] - b[0]) * 111320;
   return Math.hypot(dx, dy);
 }
-function collegamentoDi(gruppo, wr) {
+function collegamentoDi(gruppo, wr, kind) {
+  kind = kind || "COLLEGAMENTI";
   for (var i = 0; i < S.layers.length; i++) {
     var L = S.layers[i];
-    if (L.kind !== "COLLEGAMENTI" || L.group !== gruppo) continue;
+    if (L.kind !== kind || L.group !== gruppo) continue;
     for (var fid = 0; fid < L.rows.length; fid++) if (val(L, fid, "WR") === wr) return [L, fid];
     return [L, -1];
   }
@@ -1574,6 +1671,7 @@ function usaStrumento(latlng) {
   if (s.tipo === "sposta") {
     modifica(L, fid, [{ c: "_POS", d: [+latlng.lng.toFixed(7), +latlng.lat.toFixed(7)] }], op);
     if (L.kind === "WR") aggiornaCollegamento(L, fid, op);
+    else if (L.kind === "MB") mbRiposiziona(L, fid, op);
     salvaRegistro();
     fermaStrumento();
     info("Spostato " + et);
@@ -1594,6 +1692,12 @@ function usaStrumento(latlng) {
   if (pw) cambi.push({ c: "DIST_PTE_M", d: Math.round(distM(pw, pp) * 100) / 100 });
   modifica(L, fid, cambi, op);
   aggiornaCollegamento(L, fid, op);
+  if (L.kind === "MB") {
+    // ordine Montebello: dati della PTE scelta e confronto con la ROE TIM
+    var vp = valoriPteMb(Lp, fp);
+    modifica(L, fid, Object.keys(vp).filter(function (k) { return k !== "ID_PTE"; }).map(function (k) { return { c: k, d: vp[k] || null }; }), op);
+    mbAggiornaRoe(L, fid, op);
+  }
   salvaRegistro();
   fermaStrumento();
   info("WR " + et + " associata alla PTE " + (val(Lp, fp, "CLLI_CODE") || val(Lp, fp, "OBJECTID")) + " (" + val(Lp, fp, "TILABEL") + ")" +
@@ -1602,7 +1706,7 @@ function usaStrumento(latlng) {
 }
 // il collegamento prende classificazione e squadra della sua WR
 function sincronizzaCollegamento(L, fid, op) {
-  var cl = collegamentoDi(L.group, val(L, fid, "WR"));
+  var cl = collegamentoDi(L.group, val(L, fid, "WR"), L.kind === "MB" ? "MB_COLL" : "COLLEGAMENTI");
   if (!cl || cl[1] === -1) return 0;
   var Lc = cl[0];
   return modifica(Lc, cl[1], ["CLASSIF", "SQUADRA"].filter(function (c) { return campoIdx(Lc, c) !== -1; })
@@ -1618,14 +1722,14 @@ function aggiornaCollegamento(L, fid, op) {
     return false;
   });
   if (pp && pw) modifica(L, fid, [{ c: "DIST_PTE_M", d: Math.round(distM(pw, pp) * 100) / 100 }], op);
-  var cl = collegamentoDi(L.group, wr);
+  var cl = collegamentoDi(L.group, wr, L.kind === "MB" ? "MB_COLL" : "COLLEGAMENTI");
   if (!cl) return;
   var linea = pw && pp ? [pw, pp] : null;
   if (cl[1] === -1) {
     if (!linea) return;
     var Lc = cl[0];
     var row = Lc.fields.map(function (f) {
-      return f === "WR" ? wr : f === "ID_PTE" ? idp : f === "TILABEL_PT" ? val(L, fid, "TILABEL_PT") : f === "SQUADRA" ? val(L, fid, "SQUADRA") : f === "CLASSIF" ? val(L, fid, "CLASSIF") : null;
+      return f === "WR" ? wr : f === "ID_PTE" ? idp : campoIdx(L, f) !== -1 ? (val(L, fid, f) || null) : null;
     });
     registraNuova(Lc, row, linea, op);
   } else {
@@ -1928,7 +2032,7 @@ function esci() {
   apriAccesso();
 }
 function applicaRuolo() {
-  wrMieCache = null;
+  wrMieCache = null; mbMieCache = null;
   fermaStrumento();
   chiudiScheda();
   chiudiImpostazioni();
@@ -1941,7 +2045,7 @@ function applicaRuolo() {
   document.getElementById("utRuolo").textContent = S.utente.username + ", " + RUOLI[S.utente.ruolo] + (S.utente.squadra && S.utente.ruolo === "squadra" ? " " + S.utente.squadra : "") + (S.utente.at && S.utente.ruolo === "assistente" ? " " + S.utente.at : "");
   document.getElementById("btnImpostazioni").hidden = !eMaster();
   document.getElementById("blkCarica").hidden = !(eMaster() || ruolo() === "assistente");
-  ["btnCartella", "btnFile"].forEach(function (id) { document.getElementById(id).hidden = !eMaster(); });
+  ["btnCartella", "btnFile", "btnSt"].forEach(function (id) { document.getElementById(id).hidden = !eMaster(); });
   disegnaCartella();
   aggiornaTitoli();
   costruisciPannelloLayer();
@@ -1950,6 +2054,8 @@ function applicaRuolo() {
   mostraProve();
   aggiornaSquadra();
   aggiornaAvanzamento();
+  aggiornaMbSquadra();
+  aggiornaMbBlocco();
   if (ruolo() === "squadra") {
     var bb = null;
     tutteWR(function (L, fid) { return visibileFid(L, fid); }).forEach(function (x) { bb = estendi(bb, punto(x[0], x[1])); });
@@ -2009,7 +2115,7 @@ function disegnaImpostazioni() {
 
 // --- simboli ---
 function impSimboli() {
-  var k = S.kindImp, cfg = CONFIG.layers[k], linea = k === "COLLEGAMENTI";
+  var k = S.kindImp, cfg = CONFIG.layers[k], linea = eLinea(k);
   var campi = campiDelTipo(k);
   if (k === "CIVICI") campi = [CAMPO_TIPO_LAYER].concat(campi);
   var optCampi = campi.map(function (c) { return [c, aliasCampo(k, c) + (aliasCampo(k, c) !== c && c !== CAMPO_TIPO_LAYER ? " (" + c + ")" : "")]; });
@@ -2212,7 +2318,7 @@ function impUtenti() {
         campi.filter(function (c) { return c !== "DATA_IMP" && c !== "UTENTE_IMP"; }).map(function (c) {
           return '<label class="chk"><input type="checkbox" data-pc="' + esc(c) + '"' + ((p.campi[k] || []).indexOf(c) !== -1 ? " checked" : "") + "> " + esc(aliasCampo(k, c)) + "</label>";
         }).join("") +
-        (k !== "COLLEGAMENTI" ? '<label class="chk forte"><input type="checkbox" data-ps="1"' + ((p.sposta || {})[k] ? " checked" : "") + "> Può spostare</label>" : "") +
+        (!eLinea(k) ? '<label class="chk forte"><input type="checkbox" data-ps="1"' + ((p.sposta || {})[k] ? " checked" : "") + "> Può spostare</label>" : "") +
         (k === "WR" ? '<label class="chk forte"><input type="checkbox" data-pa="1"' + (p.associa ? " checked" : "") + "> Può associare WR a PTE</label>" : "") +
         "</div></div>";
     });
@@ -2421,16 +2527,16 @@ map.attributionControl.setPrefix(false);
 map.attributionControl.addAttribution("Confini comunali ISTAT via openpolis (CC BY 4.0)");
 
 [["p-comuni", 250], ["p-coll", 380], ["p-halo", 395], ["p-civ", 400], ["p-str", 410],
- ["p-bl", 415], ["p-wr", 420], ["p-label", 430], ["p-banner", 640]].forEach(function (p) {
+ ["p-bl", 415], ["p-mb", 418], ["p-wr", 420], ["p-label", 430], ["p-banner", 640]].forEach(function (p) {
   map.createPane(p[0]).style.zIndex = p[1];
 });
 map.getPane("p-label").style.pointerEvents = "none";
 map.getPane("p-banner").style.pointerEvents = "none";
 var R = {};
-["p-comuni", "p-coll", "p-halo", "p-civ", "p-str", "p-bl", "p-wr"].forEach(function (p) {
+["p-comuni", "p-coll", "p-halo", "p-civ", "p-str", "p-bl", "p-mb", "p-wr"].forEach(function (p) {
   R[p] = L.canvas({ pane: p, padding: 0.25 });
 });
-var PANE_DI = { CIVICI: "p-civ", STRUCTURE: "p-str", BLOCCHI: "p-bl", WR: "p-wr", COLLEGAMENTI: "p-coll" };
+var PANE_DI = { CIVICI: "p-civ", STRUCTURE: "p-str", BLOCCHI: "p-bl", WR: "p-wr", COLLEGAMENTI: "p-coll", MB: "p-mb", MB_COLL: "p-coll", MB_ROE: "p-coll" };
 
 // scala come in QGIS (96 dpi)
 function mpp(lat, z) { return 40075016.686 * Math.cos(lat * Math.PI / 180) / (256 * Math.pow(2, z)); }
@@ -2715,7 +2821,7 @@ function disegnaSelezione() {
       var p = punto(L, fid);
       if (!p || !b.contains(p) || !visibileFid(L, fid)) return;
       n++;
-      var r = L.kind === "WR" || L.kind === "BLOCCHI" ? 10.5 : L.kind === "STRUCTURE" ? 9 : 7.5;
+      var r = L.kind === "WR" || L.kind === "BLOCCHI" || L.kind === "MB" ? 10.5 : L.kind === "STRUCTURE" ? 9 : 7.5;
       lySel.addLayer(new Forma(p, visibile ? {
         renderer: R["p-halo"], pane: "p-halo", interactive: false, radius: r,
         color: COL.accent, weight: 4, fill: false, opacity: 1
@@ -2898,7 +3004,7 @@ function cercaCodice(testo, modo) {
   }
   if (!codici.length) return null;
   var campo, cosa, candidati, famiglia;
-  if (modo === "WR") { campo = CERCA_CAMPO_WR; cosa = "WR"; candidati = layersPerPrefisso(PRE_ANALISI_PREFIX); famiglia = PRE_ANALISI_PREFIX; }
+  if (modo === "WR") { campo = CERCA_CAMPO_WR; cosa = "WR"; candidati = layersPerPrefisso(PRE_ANALISI_PREFIX).concat(layersPerPrefisso(MB_PREFIX)); famiglia = PRE_ANALISI_PREFIX; }
   else if (egon) { campo = CERCA_CAMPI_EGON.join("/"); cosa = "EGON"; candidati = ordinaCivici(layersPerPrefisso(PREFIX_CIVICI)); famiglia = PREFIX_CIVICI; }
   else { campo = CERCA_CAMPO_CLLI; cosa = "CLLI"; candidati = layersPerPrefisso(PREFIX_STRUCTURE); famiglia = PREFIX_STRUCTURE; }
   var campoDi = new Map();
@@ -3223,6 +3329,12 @@ function etichettaVoce(L, fid) {
     return [val(L, fid, "ID_CO") || "blocco " + fid, [val(L, fid, "INDIRIZZO"), val(L, fid, "COMUNE"), val(L, fid, "CAUSALE")].filter(Boolean).join(", ")];
   }
   if (L.kind === "COLLEGAMENTI") return ["WR " + val(L, fid, "WR"), "PTE " + val(L, fid, "TILABEL_PT")];
+  if (L.kind === "MB") {
+    return ["Ordine " + (val(L, fid, "WR") || fid), [val(L, fid, "INDIRIZZO"), val(L, fid, "COMUNE"), val(L, fid, "APPUNTAM") ? "app. " + val(L, fid, "APPUNTAM") : "",
+      val(L, fid, "PTE_DIV") === "SI" ? "PTE diversa da ROE TIM" : "", haPos(L, fid) ? "" : "senza posizione"].filter(Boolean).join(", ")];
+  }
+  if (L.kind === "MB_COLL") return ["Ordine " + val(L, fid, "WR"), "PTE " + val(L, fid, "TILABEL_PT")];
+  if (L.kind === "MB_ROE") return ["Ordine " + val(L, fid, "WR"), "ROE TIM " + val(L, fid, "ROE_TIM")];
   return ["elemento " + fid, ""];
 }
 function coloreVoce(L, fid) { return categoria(L, fid).colore; }
@@ -3328,13 +3440,14 @@ document.getElementById("cardCopia").onclick = function () {
 };
 document.addEventListener("keydown", function (e) {
   if (e.key !== "Escape") return;
+  if (!elDlg.hidden && dlgFine) { dlgFine(null); return; }
   if (S.strumento) { fermaStrumento(); return; }
   if (elImp.classList.contains("aperta")) { chiudiImpostazioni(); return; }
   if (elMon.classList.contains("aperta")) { chiudiMonitor(); return; }
   if (S.card) chiudiScheda();
 });
 
-var ORDINE_CLICK = { WR: 0, BLOCCHI: 1, STRUCTURE: 2, CIVICI: 3, COLLEGAMENTI: 4 };
+var ORDINE_CLICK = { WR: 0, MB: 1, BLOCCHI: 2, STRUCTURE: 3, CIVICI: 4, COLLEGAMENTI: 5, MB_COLL: 6, MB_ROE: 7 };
 function vicini(latlng) {
   var cp = map.latLngToContainerPoint(latlng), out = [];
   S.layers.forEach(function (L) {
@@ -3551,7 +3664,7 @@ function impostaDati(gruppi, sostituisci) {
   S.layers = [];
   S.gruppi.forEach(function (g) { g.layers.forEach(function (L) { S.layers.push(L); }); });
   var nr = riapplicaRegistro();
-  wrMieCache = null;
+  wrMieCache = null; mbMieCache = null;
   S.layers.forEach(function (L) { costruisciGriglia(L); L.fg = window.L.layerGroup().addTo(map); });
   if (nr) info("Riapplicate " + nr + " modifiche salvate in questo browser");
   rimuoviBanner();
@@ -3564,6 +3677,8 @@ function impostaDati(gruppi, sostituisci) {
   mostraProve();
   aggiornaSquadra();
   aggiornaAvanzamento();
+  aggiornaMbSquadra();
+  aggiornaMbBlocco();
 }
 function estensioneDati(layers) {
   var bb = null;
@@ -3598,7 +3713,7 @@ function layerDaGeojson(fc, nome, gruppo, kind) {
     Object.keys(f.properties || {}).forEach(function (k) { if (!visti.has(k)) { visti.add(k); fields.push(k); } });
   });
   var n = feats.length, rows = new Array(n), xy = new Float64Array(2 * n), lines = null, proiettate = 0;
-  var linea = kind === "COLLEGAMENTI";
+  var linea = eLinea(kind);
   if (linea) lines = new Array(n);
   for (var i = 0; i < n; i++) {
     var f = feats[i], p = f.properties || {};
@@ -3755,7 +3870,7 @@ async function caricaFile(fileList) {
       (errori.length ? ". " + errori.slice(0, 3).join("; ") : ""));
     return;
   }
-  var ordine = { STRUCTURE: 0, CIVICI: 1, WR: 2, COLLEGAMENTI: 3, BLOCCHI: 4 };
+  var ordine = ORDINE_KIND;
   var gruppi = Array.from(perGruppo.entries()).sort(function (a, b) { return a[0] < b[0] ? -1 : 1; }).map(function (x) {
     x[1].sort(function (a, b) { return (ordine[a.kind] - ordine[b.kind]) || (a.name < b.name ? -1 : 1); });
     return { nome: x[0], layers: x[1] };
@@ -3783,7 +3898,10 @@ async function caricaFile(fileList) {
 document.getElementById("btnCartella").onclick = function () { document.getElementById("inCartella").click(); };
 document.getElementById("btnFile").onclick = function () { document.getElementById("inFile").click(); };
 document.getElementById("btnPre").onclick = function () { document.getElementById("inWr").click(); };
-[["inCartella", function (f) { return caricaCartella(f); }], ["inFile", function (f) { return caricaFile(f); }], ["inWr", function (f) { return preAnalisi(f); }]].forEach(function (x) {
+document.getElementById("btnMb").onclick = function () { document.getElementById("inMb").click(); };
+document.getElementById("btnSt").onclick = function () { document.getElementById("inSt").click(); };
+[["inCartella", function (f) { return caricaCartella(f); }], ["inFile", function (f) { return caricaFile(f); }], ["inWr", function (f) { return preAnalisi(f); }],
+ ["inMb", function (f) { return analisiMontebello(f); }], ["inSt", function (f) { return creaStructureMancanti(f); }]].forEach(function (x) {
   var el = document.getElementById(x[0]);
   el.onchange = function () { Promise.resolve(x[1](el.files)).finally(function () { el.value = ""; }); };
 });
@@ -3792,6 +3910,7 @@ document.getElementById("btnDemo").onclick = function () {
     cancellaDataset().then(function () {
       S.cartella = null;
       S.rif = { centrali: {}, at: {}, armadi: {}, armadiHdr: {}, attivi: {}, fatt: {}, imprese: {}, collaudi: {}, posizioni: {}, rubrica: [] };
+      S.aggiunte = {};
       caricaDemo();
       var bb = estensioneDati(S.layers);
       if (bb) map.fitBounds([[bb[1], bb[0]], [bb[3], bb[2]]], { padding: [24, 24] });
@@ -4257,7 +4376,7 @@ async function caricaCartella(fileList) {
     var shp = null, lista = Array.from(perBase.values()).filter(function (e) { return e.parti.shp; });
     for (var i = 0; i < lista.length; i++) {
       var e = lista[i], kind = kindDaNome(e.nome);
-      if (!kind || kind === "WR" || kind === "COLLEGAMENTI") { saltati.push(e.nome); continue; }
+      if (!kind || kind === "WR" || kind === "MB" || eLinea(kind)) { saltati.push(e.nome); continue; }
       if (!shp) shp = await caricaShpjs();
       statoCar.textContent = "Lettura di " + e.gruppo + " / " + e.nome + "...";
       await new Promise(function (r) { setTimeout(r, 0); });
@@ -4302,7 +4421,7 @@ async function caricaCartella(fileList) {
       return;
     }
     // 3. nuovi dati, marcature, squadre dalla rubrica
-    var ordine = { STRUCTURE: 0, CIVICI: 1, WR: 2, COLLEGAMENTI: 3, BLOCCHI: 4 };
+    var ordine = ORDINE_KIND;
     var gruppi = Array.from(perGruppo.entries()).sort(function (a, b) { return a[0] < b[0] ? -1 : 1; }).map(function (x) {
       x[1].sort(function (a, b) { return (ordine[a.kind] - ordine[b.kind]) || (a.name < b.name ? -1 : 1); });
       return { nome: x[0], layers: x[1] };
@@ -4319,6 +4438,8 @@ async function caricaCartella(fileList) {
     impostaDati(gruppi, true);
     var bb = estensioneDati(S.layers);
     if (bb) map.fitBounds([[bb[1], bb[0]], [bb[3], bb[2]]], { padding: [30, 30] });
+    S.aggiunte = {};
+    try { await idbOp("readwrite", function (st) { st.delete("aggiunte"); return st.delete("mbFile"); }); } catch (e2) { /* niente */ }
     applicaRuolo();
     disegnaCartella();
     await salvaDataset(true);
@@ -4627,7 +4748,7 @@ async function preAnalisi(fileList) {
   var gruppi = S.gruppi.map(function (g) {
     var l = g.layers.filter(function (L) { return L.kind !== "WR" && L.kind !== "COLLEGAMENTI"; });
     nuoviLayer.forEach(function (L) { if (L.group === g.nome) l.push(L); });
-    var ordine = { STRUCTURE: 0, CIVICI: 1, WR: 2, COLLEGAMENTI: 3, BLOCCHI: 4 };
+    var ordine = ORDINE_KIND;
     l.sort(function (a, b) { return (ordine[a.kind] - ordine[b.kind]) || (a.name < b.name ? -1 : 1); });
     return { nome: g.nome, layers: l };
   });
@@ -4652,7 +4773,1514 @@ async function preAnalisi(fileList) {
   if (inf.sospKo) avviso(inf.sospKo + " WR sospese scartate: causale diversa da " + WR_CAUSALI_SOSPESE.join(" / "));
   if (inf.doppie) info(inf.doppie + " WR ripetute: vale l'ultima letta");
   if (senzaAt) avviso(senzaAt + " WR in comuni che non sono nel file COMUNI X AT");
+  // v1.8.6: gli ordini Montebello prendono squadra e stato delle WR nuove
+  if (layersMb().length) await mbRiallinea("WR della pre-analisi");
 }
+
+// =====================================================================
+// XLSX RISCRITTO DA DENTRO: colonne in coda a un foglio lasciando il
+// resto del file com'e' (pivot, formati, altri fogli), come openpyxl
+// nell'ESPORTA EXCEL MONTEBELLO dello script
+// =====================================================================
+var CRC_TAB = null;
+function crc32(u8) {
+  if (!CRC_TAB) {
+    CRC_TAB = new Uint32Array(256);
+    for (var n = 0; n < 256; n++) {
+      var c = n;
+      for (var k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1;
+      CRC_TAB[n] = c >>> 0;
+    }
+  }
+  var crc = 0xFFFFFFFF;
+  for (var i = 0; i < u8.length; i++) crc = CRC_TAB[(crc ^ u8[i]) & 0xFF] ^ (crc >>> 8);
+  return (crc ^ 0xFFFFFFFF) >>> 0;
+}
+// voci dello zip con i dati ancora compressi (si ricopiano tali e quali)
+function zipVociGrezze(u8) {
+  var dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength);
+  var e = u8.length - 22, min = Math.max(0, u8.length - 65557);
+  while (e >= min && dv.getUint32(e, true) !== 0x06054b50) e--;
+  if (e < min) throw new Error("non e' un file xlsx (zip) valido");
+  var n = dv.getUint16(e + 10, true), off = dv.getUint32(e + 16, true), out = [];
+  var dUtf = new TextDecoder("utf-8"), dWin = new TextDecoder("windows-1252");
+  for (var i = 0; i < n; i++) {
+    if (dv.getUint32(off, true) !== 0x02014b50) throw new Error("indice dello zip non leggibile");
+    var flags = dv.getUint16(off + 8, true), metodo = dv.getUint16(off + 10, true);
+    var tempo = dv.getUint16(off + 12, true), data = dv.getUint16(off + 14, true);
+    var crc = dv.getUint32(off + 16, true), csize = dv.getUint32(off + 20, true), usize = dv.getUint32(off + 24, true);
+    var nlen = dv.getUint16(off + 28, true), xlen = dv.getUint16(off + 30, true), clen = dv.getUint16(off + 32, true);
+    var loff = dv.getUint32(off + 42, true);
+    if (csize === 0xFFFFFFFF || usize === 0xFFFFFFFF || loff === 0xFFFFFFFF) throw new Error("zip64 non gestito");
+    var nb = u8.slice(off + 46, off + 46 + nlen);
+    var lnl = dv.getUint16(loff + 26, true), lxl = dv.getUint16(loff + 28, true), ini = loff + 30 + lnl + lxl;
+    out.push({ nome: (flags & 0x800) ? dUtf.decode(nb) : dWin.decode(nb), nb: nb, flags: flags & ~0x08, metodo: metodo,
+      tempo: tempo, data: data, crc: crc, csize: csize, usize: usize, dati: u8.subarray(ini, ini + csize) });
+    off += 46 + nlen + xlen + clen;
+  }
+  return out;
+}
+function zipEstrai(v) {
+  if (v.metodo === 0) return Promise.resolve(v.dati);
+  if (v.metodo === 8) {
+    var st = new Blob([v.dati]).stream().pipeThrough(new DecompressionStream("deflate-raw"));
+    return new Response(st).arrayBuffer().then(function (b) { return new Uint8Array(b); });
+  }
+  return Promise.reject(new Error(v.nome + ": compressione non supportata"));
+}
+async function zipSostituisci(v, testoNuovo) {
+  var u8 = new TextEncoder().encode(testoNuovo), compr = null;
+  try {
+    if (window.CompressionStream) {
+      var st = new Blob([u8]).stream().pipeThrough(new CompressionStream("deflate-raw"));
+      compr = new Uint8Array(await new Response(st).arrayBuffer());
+    }
+  } catch (e) { compr = null; }
+  v.crc = crc32(u8); v.usize = u8.length;
+  if (compr) { v.metodo = 8; v.dati = compr; } else { v.metodo = 0; v.dati = u8; }
+  v.csize = v.dati.length;
+}
+function zipScrivi(voci) {
+  var tot = 22;
+  voci.forEach(function (v) { tot += 30 + v.nb.length + v.dati.length + 46 + v.nb.length; });
+  var out = new Uint8Array(tot), dv = new DataView(out.buffer), p = 0, offs = [];
+  voci.forEach(function (v) {
+    offs.push(p);
+    dv.setUint32(p, 0x04034b50, true); dv.setUint16(p + 4, 20, true); dv.setUint16(p + 6, v.flags, true);
+    dv.setUint16(p + 8, v.metodo, true); dv.setUint16(p + 10, v.tempo, true); dv.setUint16(p + 12, v.data, true);
+    dv.setUint32(p + 14, v.crc, true); dv.setUint32(p + 18, v.csize, true); dv.setUint32(p + 22, v.usize, true);
+    dv.setUint16(p + 26, v.nb.length, true); dv.setUint16(p + 28, 0, true);
+    out.set(v.nb, p + 30); out.set(v.dati, p + 30 + v.nb.length);
+    p += 30 + v.nb.length + v.dati.length;
+  });
+  var cd = p;
+  voci.forEach(function (v, i) {
+    dv.setUint32(p, 0x02014b50, true); dv.setUint16(p + 4, 20, true); dv.setUint16(p + 6, 20, true);
+    dv.setUint16(p + 8, v.flags, true); dv.setUint16(p + 10, v.metodo, true); dv.setUint16(p + 12, v.tempo, true);
+    dv.setUint16(p + 14, v.data, true); dv.setUint32(p + 16, v.crc, true); dv.setUint32(p + 20, v.csize, true);
+    dv.setUint32(p + 24, v.usize, true); dv.setUint16(p + 28, v.nb.length, true);
+    dv.setUint32(p + 42, offs[i], true);
+    out.set(v.nb, p + 46);
+    p += 46 + v.nb.length;
+  });
+  dv.setUint32(p, 0x06054b50, true); dv.setUint16(p + 8, voci.length, true); dv.setUint16(p + 10, voci.length, true);
+  dv.setUint32(p + 12, p - cd, true); dv.setUint32(p + 16, cd, true);
+  return out;
+}
+
+function xmlEsc(s) {
+  return String(s).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\ufffe\uffff]/g, "")
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function xmlDisEsc(s) {
+  return String(s).replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'")
+    .replace(/&#(\d+);/g, function (_m, n) { return String.fromCharCode(+n); })
+    .replace(/&#x([0-9a-f]+);/gi, function (_m, n) { return String.fromCharCode(parseInt(n, 16)); }).replace(/&amp;/g, "&");
+}
+function xmlAttr(tag, nome) {
+  var m = new RegExp("(?:^|\\s)" + nome.replace(/[.:]/g, "\\$&") + "\\s*=\\s*(\"([^\"]*)\"|'([^']*)')").exec(tag);
+  return m ? xmlDisEsc(m[2] !== undefined ? m[2] : m[3]) : null;
+}
+function colLettere(n) { var s = ""; n++; while (n > 0) { var r = (n - 1) % 26; s = String.fromCharCode(65 + r) + s; n = Math.floor((n - 1) / 26); } return s; }
+function colIndice(lettere) { var n = 0; for (var i = 0; i < lettere.length; i++) n = n * 26 + (lettere.charCodeAt(i) - 64); return n - 1; }
+function prefissoXml(xml, radice) {
+  var m = new RegExp("<([A-Za-z_][\\w.-]*:)?" + radice + "\\b").exec(xml);
+  return m && m[1] ? m[1] : "";
+}
+
+// percorso nello zip del foglio col nome dato (workbook.xml + rels)
+function percorsoFoglio(wbXml, relsXml, nome) {
+  var rid = null, re = /<(?:[A-Za-z_][\w.-]*:)?sheet\b[^>]*>/g, m;
+  while ((m = re.exec(wbXml))) {
+    if (xmlAttr(m[0], "name") !== nome) continue;
+    var a = /\s([A-Za-z_][\w.-]*:id)\s*=\s*"([^"]*)"/.exec(m[0]);
+    if (a) rid = a[2];
+    break;
+  }
+  if (!rid) return null;
+  var re2 = /<(?:[A-Za-z_][\w.-]*:)?Relationship\b[^>]*>/g;
+  while ((m = re2.exec(relsXml))) {
+    if (xmlAttr(m[0], "Id") !== rid) continue;
+    var t = xmlAttr(m[0], "Target") || "";
+    if (t.charAt(0) === "/") return t.slice(1);
+    var base = ["xl"];
+    t.split("/").forEach(function (s) { if (s === "..") base.pop(); else if (s && s !== ".") base.push(s); });
+    return base.join("/");
+  }
+  return null;
+}
+
+// styles.xml: font bianco grassetto, riempimenti (intestazione, PTE diversa)
+// e formato 0.0 per le distanze. Ritorna gli indici dei nuovi stili.
+function patchStili(xml, coloreIntest, coloreDiv) {
+  var m = /<([A-Za-z_][\w.-]*:)?styleSheet\b[^>]*>/.exec(xml);
+  if (!m) return null;
+  var p = m[1] || "";
+  function blocco(tag) { return new RegExp("<" + p + tag + "\\b([^>]*)>([\\s\\S]*?)</" + p + tag + ">").exec(xml); }
+  function conta(testo, tag) { return (testo.match(new RegExp("<" + p + tag + "\\b", "g")) || []).length; }
+  function aggiungi(b, tag, nuovi, n) {
+    var testa = b[0].slice(0, b[0].indexOf(">") + 1), coda = "</" + p + tag + ">";
+    if (/\scount\s*=\s*"\d+"/.test(testa)) testa = testa.replace(/(\scount\s*=\s*")\d+"/, "$1" + n + '"');
+    xml = xml.slice(0, b.index) + testa + b[2] + nuovi + coda + xml.slice(b.index + b[0].length);
+  }
+  // formato numerico
+  var idNum = 164, nf = blocco("numFmts");
+  if (nf) {
+    (nf[2].match(/numFmtId\s*=\s*"(\d+)"/g) || []).forEach(function (x) { idNum = Math.max(idNum, +/\d+/.exec(x)[0] + 1); });
+    aggiungi(nf, "numFmts", "<" + p + 'numFmt numFmtId="' + idNum + '" formatCode="0.0"/>', conta(nf[2], "numFmt") + 1);
+  } else {
+    var aperto = m.index + m[0].length;
+    if (/\/>$/.test(m[0])) return null;
+    xml = xml.slice(0, aperto) + "<" + p + 'numFmts count="1"><' + p + 'numFmt numFmtId="164" formatCode="0.0"/></' + p + "numFmts>" + xml.slice(aperto);
+  }
+  var fo = blocco("fonts"), fi = blocco("fills"), xf = blocco("cellXfs");
+  if (!fo || !fi || !xf) return null;
+  var idFont = conta(fo[2], "font");
+  aggiungi(fo, "fonts", "<" + p + "font><" + p + "b/><" + p + 'sz val="11"/><' + p + 'color rgb="FFFFFFFF"/><' + p + 'name val="Calibri"/><' + p + 'family val="2"/></' + p + "font>", idFont + 1);
+  fi = blocco("fills");
+  var idFill = conta(fi[2], "fill");
+  function riemp(c) { return "<" + p + "fill><" + p + 'patternFill patternType="solid"><' + p + 'fgColor rgb="FF' + c + '"/><' + p + 'bgColor indexed="64"/></' + p + "patternFill></" + p + "fill>"; }
+  aggiungi(fi, "fills", riemp(coloreIntest) + riemp(coloreDiv), idFill + 2);
+  xf = blocco("cellXfs");
+  var idXf = conta(xf[2], "xf"), xfId = /<([A-Za-z_][\w.-]*:)?cellStyleXfs\b/.test(xml) ? ' xfId="0"' : "";
+  aggiungi(xf, "cellXfs",
+    "<" + p + 'xf numFmtId="0" fontId="' + idFont + '" fillId="' + idFill + '" borderId="0"' + xfId + ' applyFont="1" applyFill="1" applyAlignment="1"><' + p + 'alignment horizontal="center" vertical="center" wrapText="1"/></' + p + "xf>" +
+    "<" + p + 'xf numFmtId="' + idNum + '" fontId="0" fillId="0" borderId="0"' + xfId + ' applyNumberFormat="1"/>' +
+    "<" + p + 'xf numFmtId="0" fontId="0" fillId="' + (idFill + 1) + '" borderId="0"' + xfId + ' applyFill="1"/>', idXf + 3);
+  return { xml: xml, h: idXf, n: idXf + 1, div: idXf + 2 };
+}
+
+// foglio: celle nuove nelle colonne da prima (0-based) in poi.
+// perRiga: Map(numero riga 1-based -> [{v, s}]) con s = "h" | "n" | "div" | null.
+// Le celle gia' presenti in quelle colonne restano se la nuova e' vuota.
+function patchFoglio(xml, prima, perRiga, stili, larghezze) {
+  var p = prefissoXml(xml, "worksheet"), ncol = 0, mancanti = 0;
+  perRiga.forEach(function (c) { ncol = Math.max(ncol, c.length); });
+  var ultima = prima + ncol - 1;
+  function cella(rn, col, x) {
+    var s = x.s && stili ? stili[x.s] : null, rif = colLettere(col) + rn;
+    var at = "<" + p + 'c r="' + rif + '"' + (s !== null && s !== undefined ? ' s="' + s + '"' : "");
+    if (typeof x.v === "number" && isFinite(x.v)) return at + "><" + p + "v>" + x.v + "</" + p + "v></" + p + "c>";
+    return at + ' t="inlineStr"><' + p + "is><" + p + 't xml:space="preserve">' + xmlEsc(x.v) + "</" + p + "t></" + p + "is></" + p + "c>";
+  }
+  var visti = new Set(), rigaPrec = 0;
+  var reRiga = new RegExp("<" + p + "row\\b([^>]*?)(/>|>([\\s\\S]*?)</" + p + "row>)", "g");
+  var reCella = new RegExp("<" + p + "c\\b([^>]*?)(/>|>[\\s\\S]*?</" + p + "c>)", "g");
+  var i0 = xml.indexOf("<" + p + "sheetData"), i1 = xml.lastIndexOf("</" + p + "sheetData>");
+  if (i0 === -1 || i1 === -1) throw new Error("foglio senza sheetData");
+  var dati = xml.slice(i0, i1).replace(reRiga, function (tutto, attr, _chiusa, contenuto) {
+    var mr = /\sr\s*=\s*"(\d+)"/.exec(attr), rn = mr ? +mr[1] : rigaPrec + 1;
+    rigaPrec = rn;
+    var nuove = perRiga.get(rn);
+    if (!nuove) return tutto;
+    visti.add(rn);
+    var prima1 = [], dopo = [], vecchie = {}, colPrec = -1;
+    (contenuto || "").replace(reCella, function (c, ac) {
+      var m = /\sr\s*=\s*"([A-Z]+)\d+"/.exec(ac), col = m ? colIndice(m[1]) : colPrec + 1;
+      colPrec = col;
+      if (col < prima) prima1.push(c);
+      else if (col > ultima) dopo.push(c);
+      else vecchie[col] = c;
+      return "";
+    });
+    var mezzo = [];
+    for (var j = 0; j < ncol; j++) {
+      var x = nuove[j], col = prima + j;
+      if (x && x.v !== null && x.v !== undefined && x.v !== "") mezzo.push(cella(rn, col, x));
+      else if (vecchie[col]) mezzo.push(vecchie[col]);
+    }
+    var a = attr.replace(/\sspans\s*=\s*"[^"]*"/, "");
+    if (!mr) a += ' r="' + rn + '"';
+    return "<" + p + "row" + a + ">" + prima1.concat(mezzo, dopo).join("") + "</" + p + "row>";
+  });
+  perRiga.forEach(function (_c, rn) { if (!visti.has(rn)) mancanti++; });
+  xml = xml.slice(0, i0) + dati + xml.slice(i1);
+  // dimensione del foglio
+  xml = xml.replace(new RegExp("(<" + p + 'dimension\\b[^>]*\\sref\\s*=\\s*")([^"]*)"'), function (_t, a, ref) {
+    var m = /^([A-Z]+)(\d+)(?::([A-Z]+)(\d+))?$/.exec(ref);
+    if (!m) return a + ref + '"';
+    var c2 = m[3] || m[1], r2 = m[4] || m[2];
+    if (colIndice(c2) >= ultima) return a + ref + '"';
+    return a + m[1] + m[2] + ":" + colLettere(ultima) + r2 + '"';
+  });
+  // larghezze delle colonne nuove (solo oltre quelle gia' descritte)
+  if (larghezze && larghezze.length) {
+    var mc = new RegExp("<" + p + "cols\\b[^>]*>([\\s\\S]*?)</" + p + "cols>").exec(xml), maxEs = -1;
+    if (mc) (mc[1].match(/\smax\s*=\s*"(\d+)"/g) || []).forEach(function (x) { maxEs = Math.max(maxEs, +/\d+/.exec(x)[0] - 1); });
+    var cols = "";
+    larghezze.forEach(function (w, j) {
+      var c = prima + j;
+      if (c > maxEs) cols += "<" + p + 'col min="' + (c + 1) + '" max="' + (c + 1) + '" width="' + w + '" customWidth="1"/>';
+    });
+    if (cols) {
+      if (mc) { var fine = mc.index + mc[0].lastIndexOf("</"); xml = xml.slice(0, fine) + cols + xml.slice(fine); }
+      else { var ip = xml.indexOf("<" + p + "sheetData"); xml = xml.slice(0, ip) + "<" + p + "cols>" + cols + "</" + p + "cols>" + xml.slice(ip); }
+    }
+  }
+  return { xml: xml, mancanti: mancanti };
+}
+
+// u8 = file xlsx originale; ritorna il file con le celle nuove
+async function xlsxConCelle(u8, nomeFoglio, prima, perRiga, larghezze, coloreIntest, coloreDiv) {
+  var voci = zipVociGrezze(u8), per = {};
+  voci.forEach(function (v) { per[v.nome.replace(/^\//, "")] = v; });
+  var dec = new TextDecoder("utf-8");
+  if (!per["xl/workbook.xml"] || !per["xl/_rels/workbook.xml.rels"]) throw new Error("struttura xlsx non riconosciuta");
+  var path = percorsoFoglio(dec.decode(await zipEstrai(per["xl/workbook.xml"])), dec.decode(await zipEstrai(per["xl/_rels/workbook.xml.rels"])), nomeFoglio);
+  if (!path || !per[path]) throw new Error("foglio " + nomeFoglio + " non trovato nello zip");
+  var stili = null;
+  if (per["xl/styles.xml"]) {
+    stili = patchStili(dec.decode(await zipEstrai(per["xl/styles.xml"])), coloreIntest, coloreDiv);
+    if (stili) await zipSostituisci(per["xl/styles.xml"], stili.xml);
+  }
+  var pf = patchFoglio(dec.decode(await zipEstrai(per[path])), prima, perRiga, stili, larghezze);
+  await zipSostituisci(per[path], pf.xml);
+  return { u8: zipScrivi(voci), mancanti: pf.mancanti, stili: !!stili };
+}
+
+// =====================================================================
+// FINESTRE (come le QMessageBox / QDialog dello script)
+// =====================================================================
+var elDlg = document.getElementById("dlg"), dlgFine = null;
+// o: {titolo, html, bottoni: [{id, testo, pri, scegli: accept, multiplo}], apri(corpo)}
+// ritorna {id, files} oppure null se si chiude
+function dialogo(o) {
+  if (dlgFine) dlgFine(null);
+  return new Promise(function (ok) {
+    document.getElementById("dlgTit").textContent = o.titolo || "";
+    var corpo = document.getElementById("dlgCorpo"), piede = document.getElementById("dlgPiede");
+    corpo.innerHTML = o.html || "";
+    piede.innerHTML = (o.bottoni || [{ id: "ok", testo: "Chiudi", pri: true }]).map(function (b, i) {
+      return '<button type="button" class="btn' + (b.pri ? " btn-pri" : "") + '" data-b="' + i + '">' + esc(b.testo) + "</button>";
+    }).join("");
+    var finito = false;
+    dlgFine = function (r) {
+      if (finito) return;
+      finito = true; dlgFine = null;
+      elDlg.hidden = true;
+      ok(r);
+    };
+    piede.querySelectorAll("[data-b]").forEach(function (el) {
+      var b = (o.bottoni || [{ id: "ok" }])[+el.dataset.b];
+      el.onclick = function () {
+        if (!b.scegli) { dlgFine({ id: b.id }); return; }
+        // la scelta del file parte dal clic (serve il gesto dell'utente)
+        scegliFile(b.scegli, b.multiplo).then(function (files) { if (dlgFine) dlgFine({ id: b.id, files: files }); });
+      };
+    });
+    document.getElementById("dlgChiudi").onclick = function () { dlgFine(null); };
+    elDlg.hidden = false;
+    if (o.apri) o.apri(corpo);
+    var primo = piede.querySelector(".btn-pri") || piede.querySelector("button");
+    if (primo) primo.focus();
+  });
+}
+function scegliFile(accept, multiplo) {
+  return new Promise(function (ok) {
+    var inp = document.createElement("input"), fatto = false;
+    inp.type = "file"; inp.accept = accept || ""; inp.multiple = !!multiplo; inp.hidden = true;
+    document.body.appendChild(inp);
+    function fine(v) { if (fatto) return; fatto = true; window.removeEventListener("focus", fuoco); inp.remove(); ok(v); }
+    function fuoco() { setTimeout(function () { if (!inp.files || !inp.files.length) fine(null); }, 1200); }
+    inp.addEventListener("change", function () { fine(inp.files && inp.files.length ? Array.prototype.slice.call(inp.files) : null); });
+    inp.addEventListener("cancel", function () { fine(null); });
+    window.addEventListener("focus", fuoco);
+    inp.click();
+  });
+}
+function scaricaBin(nome, dati, tipo) {
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([dati], { type: tipo || "application/octet-stream" }));
+  a.download = nome;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function () { URL.revokeObjectURL(a.href); }, 60000);
+  info("File pronto: " + nome);
+}
+var MIME_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+function oggiCompatto() { var d = new Date(); function p(n) { return (n < 10 ? "0" : "") + n; } return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()); }
+function nomeFileSicuro(s) { return clean(s).replace(/[^A-Za-z0-9._-]+/g, "_").replace(/^_+|_+$/g, "") || "SENZA_NOME"; }
+function tick() { return new Promise(function (r) { setTimeout(r, 0); }); }
+function righeTesto(righe) { return '<pre class="dlg-pre">' + esc(righe.join("\n")) + "</pre>"; }
+
+// =====================================================================
+// ANALISI MONTEBELLO (v1.8.4 - v1.8.9 dello script): export TIM degli
+// ordini in delivery, analizzato come la PRE-ANALISI WR piu' il confronto
+// con la ROE indicata da TIM. Layer suoi: le WR non si toccano.
+// =====================================================================
+var MB_HDR = {
+  dtu: ["ID dispacciamento", "ID DTU"], dtu_alt: ["ID appuntamento"], roe: ["Roe"], attivi: ["Roe FTTH attivi"],
+  comune: ["Indirizzo Cliente Comune", "Comune"], indirizzo: ["Indirizzo Cliente", "Indirizzo"],
+  data: ["Data Appuntamento", "Appuntamento"], stato: ["Stato"], sottostato: ["Sottostato"],
+  centrale: ["Centrale", "Centrale MUX"], lavoraz: ["Jobtype descrizione", "Dettaglio Tipo Lavorazione"], wr_wfm: ["WR WFM"]
+};
+var MB_CHIAVI_ORDINE = ["dtu", "dtu_alt"], MB_HDR_OBBLIGATORIE = ["comune", "indirizzo"];
+var MB_SIGLE_PROVINCIA = { PE: "PESCARA", CH: "CHIETI", TE: "TERAMO", AQ: "AQUILA", CB: "CAMPOBASSO", IS: "ISERNIA",
+  AN: "ANCONA", AP: "ASCOLI", FM: "FERMO", MC: "MACERATA", PU: "PESARO", PG: "PERUGIA", TR: "TERNI" };
+var MB_ATTIVI_SI = "ALMENO 1";
+var MB_WR_CAMPI = [["WR_SQUADRA", "SQUADRA"], ["WR_STATO", "STATO"], ["WR_CLASSIF", "CLASSIF"], ["WR_NOTE", "NOTE"], ["WR_PTE", "ID_PTE"]];
+var MB_WR_SI = "SI", MB_WR_NO = "NO", MB_WR_SENZA = "SENZA WR";
+var MB_DIV_SI = "SI", MB_DIV_NO = "NO", MB_DIV_ROE_ND = "ROE NON IN MAPPA", MB_DIV_SENZA_ROE = "SENZA ROE";
+var MB_ESITO_SU_ROE = "NO_CIVICO_SU_ROE", MB_ESITO_SENZA_IND = "SENZA_INDIRIZZO_SU_ROE", ESITO_MANUALE = "POSIZIONATO_MANUALE";
+var MB_CAMPI_CONSERVATI = ["CLASSIF", "NOTE"];
+var CAMPI_MB = CAMPI_WR.filter(function (c) { return CAMPI_WR_IMPIANTO.indexOf(c) === -1; }).concat(
+  ["ROE_TIM", "PTE_DIV", "DIST_ROE_M", "IMP_ROE", "IMP_ATTIVO", "LAVORAZ", "WR_WFM", "WR_PRED"],
+  MB_WR_CAMPI.map(function (x) { return x[0]; }));
+var CAMPI_MB_LINEE = ["WR", "ID_PTE", "TILABEL_PT", "DIST_PTE_M", "ROE_TIM", "PTE_DIV", "DIST_ROE_M", "CLASSIF", "WR_SQUADRA"];
+var MB_EXPORT_COLONNE = [
+  ["PROVINCIA", "PROVINCIA"], ["AT", "AT"], ["ESITO", "ESITO ANALISI"], ["TIPO_CIV", "TIPO CIVICO"], ["ID_PTE", "PTE PIU' VICINA"],
+  ["TILABEL_PT", "TILABEL PTE"], ["ARMADIO", "ARMADIO"], ["DIST_PTE_M", "DISTANZA PTE (m)"], ["IMPRESA", "IMPRESA ESECUTRICE PTE"],
+  ["PTE_DIV", "PTE DIVERSA DA ROE TIM"], ["DIST_ROE_M", "DISTANZA ROE TIM (m)"], ["IMP_ROE", "IMPRESA ESECUTRICE ROE TIM"],
+  ["PTE_FATT", "PTE FATTURATA"], ["ARM_KO", "ARMADIO NON LAVORATO"], ["ARM_ASSIST", "ASSISTENTE ARMADIO"], ["ARM_WEEK", "WEEK RECUPERO ARMADIO"],
+  ["CLASSIF", "CLASSIFICAZIONE"], ["NOTE", "NOTE"], ["WR_PRED", "WR NEL PREDELIVERY"], ["WR_SQUADRA", "SQUADRA WR"],
+  ["WR_STATO", "STATO WR"], ["WR_CLASSIF", "CLASSIFICAZIONE WR"], ["WR_NOTE", "NOTE WR"], ["WR_PTE", "PTE WR"]
+];
+var MB_EXPORT_NUMERICI = ["DIST_PTE_M", "DIST_ROE_M"];
+var MB_EXPORT_NON_IN_ANALISI = "NON IN ANALISI", MB_EXPORT_SUFFISSO = "_ANALISI_MONTEBELLO";
+var MB_EXPORT_COLORE_INTEST = "0E5A6B", MB_EXPORT_COLORE_DIV = "FFC000";
+var MB_SQUADRE_FILE = "MONTEBELLO";
+var MB_ESCLUDI_ARMADI_KO = true;   // v1.8.9: gli impianti sugli armadi da recuperare non vanno alle squadre
+
+function chiaveWr(v) { return normVal(clean(v)).toUpperCase(); }
+function mbNormHdr(t) { return senzaAccenti(t === null || t === undefined ? "" : String(t)).toUpperCase().replace(/\s+/g, " ").trim(); }
+function mbCodiceOrdine(rec) {
+  for (var i = 0; i < MB_CHIAVI_ORDINE.length; i++) { var v = chiaveWr(rec[MB_CHIAVI_ORDINE[i]]); if (v) return v; }
+  return "";
+}
+function mbComuneESigla(v) {
+  var s = normTxt(v), m = /^(.*\S)\s+\(?([A-Z]{2})\)?$/.exec(s);
+  if (m && MB_SIGLE_PROVINCIA[m[2]]) return [m[1].trim(), m[2]];
+  return [s, ""];
+}
+function mbData(v) {
+  var s = testoCella(v);
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) s = dataWr(s);
+  if (/ 00:00$/.test(s)) s = s.slice(0, -6);
+  return s;
+}
+function mbFlagAttivo(v) {
+  var s = normTxt(v);
+  if (!s) return "";
+  var f = flagAttivo(v);
+  if (f) return f;
+  if (s.indexOf(MB_ATTIVI_SI) !== -1 || /\b[1-9]\d*\s+CLIENT/.test(s)) return ATTIVI_SI;
+  if (s.indexOf("ZERO") === 0 || s.indexOf("0 ") === 0 || s.indexOf("NESSUN") !== -1) return ATTIVI_NO;
+  return "";
+}
+function mbCentraleWr(v) { var s = clean(v).toUpperCase(); return /^\d{5}[A-Z]\b/.test(s) ? siglaCentrale(s) : ""; }
+function mbCentrale(v) { return mbCentraleWr(v) || clean(v).toUpperCase(); }
+function mbValoriRiga(rec) {
+  return { STATO: testoCella(rec.stato), DISPACCIO: testoCella(rec.sottostato), APPUNTAM: mbData(rec.data), CENTRALE: mbCentrale(rec.centrale),
+    ROE_TIM: clean(rec.roe).toUpperCase(), IMP_ATTIVO: mbFlagAttivo(rec.attivi), LAVORAZ: testoCella(rec.lavoraz), WR_WFM: chiaveWr(rec.wr_wfm) };
+}
+function mbGruppoDaSigla(sigla, gruppi) {
+  var nome = MB_SIGLE_PROVINCIA[sigla || ""];
+  if (!nome) return null;
+  var g = gruppi.slice().sort().filter(function (x) { return normTxt(x).indexOf(nome) !== -1; })[0];
+  return g || null;
+}
+function mbDataChiave(app) {
+  var s = clean(app), m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(s);
+  function p(n) { return (+n < 10 ? "0" : "") + (+n); }
+  return m ? p(m[1]) + "/" + p(m[2]) + "/" + m[3] : s.toUpperCase();
+}
+
+// --- lettura del file TIM ---
+function valoreCella(X, ws, r, c) {
+  var cell = ws[X.utils.encode_cell({ r: r, c: c })];
+  if (!cell) return null;
+  if (cell.t === "n" && cell.z && X.SSF.is_date(cell.z)) {
+    var d = X.SSF.parse_date_code(cell.v);
+    return d ? new Date(d.y, d.m - 1, d.d, d.H, d.M, Math.floor(d.S)) : cell.v;
+  }
+  if (cell.t === "d") return cell.v;
+  if (cell.t === "e" || cell.t === "z") return null;
+  return cell.v === undefined ? null : cell.v;
+}
+// primo foglio con un'intestazione del codice ordine nelle prime righe
+function mbTrovaFoglio(X, wb) {
+  var chiavi = [];
+  MB_CHIAVI_ORDINE.forEach(function (k) { MB_HDR[k].forEach(function (h) { chiavi.push(mbNormHdr(h)); }); });
+  for (var i = 0; i < wb.SheetNames.length; i++) {
+    var nome = wb.SheetNames[i], ws = wb.Sheets[nome];
+    if (!ws || !ws["!ref"]) continue;
+    var rg = X.utils.decode_range(ws["!ref"]);
+    for (var r = rg.s.r; r <= Math.min(rg.e.r, rg.s.r + SEARCH_ROWS - 1); r++) {
+      var perNorm = {}, trovata = false, ultima = -1;
+      for (var c = rg.s.c; c <= rg.e.c; c++) {
+        var v = valoreCella(X, ws, r, c);
+        if (v === null || String(v).trim() === "") continue;
+        ultima = c;
+        var k = mbNormHdr(v);
+        if (!(k in perNorm)) perNorm[k] = c;
+        if (chiavi.indexOf(k) !== -1) trovata = true;
+      }
+      if (trovata) return { nome: nome, ws: ws, hr: r, rg: rg, perNorm: perNorm, ultima: ultima };
+    }
+  }
+  return null;
+}
+function mbMappaColonne(perNorm) {
+  var out = {};
+  Object.keys(MB_HDR).forEach(function (k) {
+    for (var i = 0; i < MB_HDR[k].length; i++) { var h = mbNormHdr(MB_HDR[k][i]); if (h in perNorm) { out[k] = perNorm[h]; return; } }
+  });
+  return out;
+}
+async function mbLeggiFile(buf, nome) {
+  var X = await caricaXlsx();
+  var wb = X.read(buf, { type: "array", cellNF: true, cellDates: false });
+  var info = { file: nome, foglio: "", righe: 0, doppie: 0, mancano: [], assenti: [], avvisi: [], senzaInd: 0, senzaCodice: 0 };
+  var t = mbTrovaFoglio(X, wb);
+  var intestChiave = [];
+  MB_CHIAVI_ORDINE.forEach(function (k) { intestChiave = intestChiave.concat(MB_HDR[k]); });
+  if (!t) { info.avvisi.push("nessuna colonna " + intestChiave.join(" / ") + " nelle prime " + SEARCH_ROWS + " righe dei fogli"); return { righe: [], info: info }; }
+  info.foglio = t.nome;
+  var mappa = mbMappaColonne(t.perNorm);
+  if (!MB_CHIAVI_ORDINE.some(function (k) { return k in mappa; })) info.mancano.push(intestChiave.join(" / "));
+  MB_HDR_OBBLIGATORIE.forEach(function (k) { if (!(k in mappa)) info.mancano.push(MB_HDR[k].join(" / ")); });
+  if (info.mancano.length) return { righe: [], info: info };
+  info.assenti = Object.keys(MB_HDR).filter(function (k) {
+    return !(k in mappa) && MB_HDR_OBBLIGATORIE.indexOf(k) === -1 && MB_CHIAVI_ORDINE.indexOf(k) === -1;
+  }).map(function (k) { return MB_HDR[k][0]; });
+  var perChiave = new Map(), anonime = 0;
+  for (var r = t.hr + 1; r <= t.rg.e.r; r++) {
+    var rec = {};
+    Object.keys(MB_HDR).forEach(function (k) { rec[k] = k in mappa ? valoreCella(X, t.ws, r, mappa[k]) : null; });
+    var codice = mbCodiceOrdine(rec), cs = mbComuneESigla(rec.comune), indirizzo = clean(rec.indirizzo);
+    if (!codice && !clean(rec.roe) && !cs[0] && !indirizzo) continue;
+    rec.comune = cs[0]; rec.sigla = cs[1]; rec.indirizzo = indirizzo;
+    info.righe++;
+    if (!cs[0] && !indirizzo) info.senzaInd++;
+    rec.codice = codice;
+    var chiave = codice;
+    if (!chiave) { anonime++; info.senzaCodice++; chiave = "#" + anonime; }
+    if (perChiave.has(chiave)) { info.doppie++; perChiave.set(chiave, Object.assign(rec, { chiave: chiave })); }
+    else { rec.chiave = chiave; perChiave.set(chiave, rec); }
+  }
+  return { righe: Array.from(perChiave.values()), info: info };
+}
+
+// --- layer, indici e permessi ---
+function layersMb(kind) { return S.layers.filter(function (L) { return L.kind === (kind || "MB"); }); }
+function ordiniMb(filtro) {
+  var out = [];
+  layersMb().forEach(function (L) { for (var fid = 0; fid < L.rows.length; fid++) if (!filtro || filtro(L, fid)) out.push([L, fid]); });
+  return out;
+}
+// v1.8.9: armadio della PTE piu' vicina se e' da recuperare (CSV recupero PNRR),
+// senza CSV vale ARM_KO
+function mbArmadioDaRecuperare(L, fid) {
+  var arm = val(L, fid, "ARMADIO");
+  if (Object.keys(S.rif.armadi || {}).length) return S.rif.armadi[normArmadio(arm)] ? (arm || "-") : "";
+  return val(L, fid, "ARM_KO").toUpperCase() === "SI" ? (arm || "-") : "";
+}
+var mbMieCache = null;
+function mbMioOrdine(L, fid) {
+  var mia = compatta(S.utente && S.utente.squadra || "");
+  if (!mia || compatta(val(L, fid, "WR_SQUADRA")) !== mia) return false;
+  return !(MB_ESCLUDI_ARMADI_KO && mbArmadioDaRecuperare(L, fid));
+}
+function mbMie() {
+  if (mbMieCache) return mbMieCache;
+  var set = new Set();
+  ordiniMb(mbMioOrdine).forEach(function (x) { set.add(val(x[0], x[1], "WR").toUpperCase()); });
+  mbMieCache = set;
+  return set;
+}
+// CLLI -> STRUCTURE (la Roe del file e' un CLLI_CODE)
+function indiceRoe() {
+  var idx = {};
+  S.layers.forEach(function (Ls) {
+    if (Ls.kind !== "STRUCTURE" || campoIdx(Ls, "CLLI_CODE") === -1) return;
+    for (var i = 0; i < Ls.rows.length; i++) { var k = normClli(val(Ls, i, "CLLI_CODE")); if (k && !(k in idx)) idx[k] = { L: Ls, fid: i }; }
+  });
+  return idx;
+}
+function mbConfronto(roe, idPte, pw, pRoe) {
+  if (!normClli(roe)) return [MB_DIV_SENZA_ROE, null];
+  if (!pRoe) return [MB_DIV_ROE_ND, null];
+  var d = pw ? Math.round(distanzaM(pw[0], pw[1], pRoe[0], pRoe[1]) * 100) / 100 : null;
+  if (!normClli(idPte)) return ["", d];
+  return [normClli(idPte) === normClli(roe) ? MB_DIV_NO : MB_DIV_SI, d];
+}
+// campi della PTE piu' vicina (come la pre-analisi WR)
+function valoriPteMb(Lp, fp) {
+  var clli = val(Lp, fp, "CLLI_CODE"), v = { ID_PTE: clli, TILABEL_PT: val(Lp, fp, "TILABEL"), ARMADIO: val(Lp, fp, "MAIN_SUB_1") };
+  var fv = valoriFatt(v.ARMADIO, v.TILABEL_PT);
+  Object.keys(fv).forEach(function (k) { v[k] = fv[k]; });
+  var ai = S.rif.armadi[normArmadio(v.ARMADIO)];
+  v.ARM_KO = ai ? "SI" : ""; v.ARM_ASSIST = ai ? ai.ARM_ASSIST : ""; v.ARM_WEEK = ai ? ai.ARM_WEEK : "";
+  v.IMPRESA = S.rif.imprese[normClli(clli)] || "";
+  return v;
+}
+// v1.8.4: ROE TIM contro PTE piu' vicina e linea verso la ROE TIM (solo se diverse);
+// lo chiamano ASSOCIA e SPOSTA sugli ordini
+function mbAggiornaRoe(L, fid, op, idx) {
+  idx = idx || indiceRoe();
+  var roe = val(L, fid, "ROE_TIM"), vr = idx[normClli(roe)], pRoe = vr ? punto(vr.L, vr.fid) : null, pw = punto(L, fid);
+  var c = mbConfronto(roe, val(L, fid, "ID_PTE"), pw, pRoe);
+  var cambi = [{ c: "PTE_DIV", d: c[0] || null }, { c: "DIST_ROE_M", d: c[1] }];
+  if (Object.keys(S.rif.imprese || {}).length) cambi.push({ c: "IMP_ROE", d: S.rif.imprese[normClli(roe)] || null });
+  modifica(L, fid, cambi, op);
+  var cl = collegamentoDi(L.group, val(L, fid, "WR"), "MB_ROE"), linea = c[0] === MB_DIV_SI && pw && pRoe ? [pw, pRoe] : null;
+  if (!cl) return c[0];
+  if (cl[1] === -1) {
+    if (linea) registraNuova(cl[0], cl[0].fields.map(function (f) { return campoIdx(L, f) !== -1 ? leggiValore(L, fid, f) : null; }), linea, op);
+  } else {
+    modifica(cl[0], cl[1], [{ c: "_LINEA", d: linea }, { c: "PTE_DIV", d: c[0] || null }, { c: "ID_PTE", d: val(L, fid, "ID_PTE") || null }], op);
+  }
+  return c[0];
+}
+// SPOSTA di un ordine: come POSIZIONA (ESITO POSIZIONATO_MANUALE, PTE piu' vicina ricalcolata)
+function mbRiposiziona(L, fid, op) {
+  var pw = punto(L, fid);
+  if (!pw) return;
+  var ip = indicePte(S.layers.filter(function (Ls) { return Ls.kind === "STRUCTURE" && Ls.group === L.group; }));
+  var np = ptePiuVicina(ip, pw[1], pw[0]), cambi = [{ c: "ESITO", d: ESITO_MANUALE }];
+  if (np) {
+    var v = valoriPteMb(np.p.L, np.p.fid);
+    Object.keys(v).forEach(function (k) { cambi.push({ c: k, d: v[k] || null }); });
+  }
+  modifica(L, fid, cambi, op);
+  aggiornaCollegamento(L, fid, op);
+  mbAggiornaRoe(L, fid, op);
+}
+
+// --- WR del predelivery per l'incrocio con WR WFM (v1.8.6) ---
+function mbIndiceWrLayer() {
+  var wr = S.layers.filter(function (L) { return L.kind === "WR"; });
+  if (!wr.length) return null;
+  var idx = {};
+  wr.forEach(function (L) {
+    for (var fid = 0; fid < L.rows.length; fid++) {
+      var k = chiaveWr(val(L, fid, "WR"));
+      if (!k || idx[k]) continue;
+      var d = {};
+      MB_WR_CAMPI.forEach(function (x) { d[x[0]] = val(L, fid, x[1]); });
+      idx[k] = d;
+    }
+  });
+  return [idx, "WR pre-analisi caricate (" + fmtN(Object.keys(idx).length) + " WR)"];
+}
+async function mbIndiceWrFile(files) {
+  var letto = await leggiExcelWr(files), idx = {};
+  letto[0].forEach(function (rec) {
+    var k = chiaveWr(rec.wr);
+    if (!k || idx[k]) return;
+    idx[k] = { WR_SQUADRA: clean(rec.squadra), WR_STATO: clean(rec.stato), WR_CLASSIF: "", WR_NOTE: "", WR_PTE: "" };
+  });
+  return [idx, "file " + files.map(function (f) { return f.name; }).join(", ") + " (" + fmtN(Object.keys(idx).length) + " WR)"];
+}
+
+// --- contesto per gruppo: PTE e civici (come la pre-analisi) ---
+function contestoMb() {
+  var ctx = {}, cenGruppo = {};
+  S.gruppi.forEach(function (g) {
+    var str = g.layers.filter(function (L) { return L.kind === "STRUCTURE"; });
+    var civ = ordinaCivici(g.layers.filter(function (L) { return L.kind === "CIVICI"; }));
+    if (!str.length || !civ.length) return;
+    var ip = indicePte(str);
+    if (!ip.pte.length) return;
+    ctx[g.nome] = { pte: ip, civ: indiceCivici(civ) };
+    ip.centrali.forEach(function (c) { if (!(c in cenGruppo)) cenGruppo[c] = g.nome; });
+  });
+  return { ctx: ctx, cenGruppo: cenGruppo };
+}
+function puntoPteDi(gruppo, idPte, cache) {
+  if (!idPte) return null;
+  var k = gruppo + "|" + idPte;
+  if (k in cache) return cache[k];
+  var p = null;
+  S.layers.some(function (Ls) {
+    if (Ls.kind !== "STRUCTURE" || Ls.group !== gruppo) return false;
+    for (var i = 0; i < Ls.rows.length; i++) if (val(Ls, i, "CLLI_CODE") === idPte || val(Ls, i, "OBJECTID") === idPte) { p = punto(Ls, i); return true; }
+    return false;
+  });
+  cache[k] = p;
+  return p;
+}
+
+// --- il cuore: ordini -> layer per provincia ---
+// o.righe: righe del file (vuoto = riallinea gli ordini gia' caricati);
+// o.modo: "nuova" | "aggiungi"; o.idxWr: indice delle WR (null = incrocio non rifatto)
+function mbCostruisci(o) {
+  var ce = contestoMb(), ctx = ce.ctx, roeIdx = indiceRoe(), rep = { perGruppo: {}, orfani: {}, nGia: 0, nCambiati: 0, indDiverso: [],
+    nuovi: 0, conservati: 0, senzaAt: {}, incrocio: null };
+  // ordini gia' caricati, con i valori di adesso (modifiche comprese)
+  var vecchi = new Map();
+  layersMb().forEach(function (L) {
+    for (var fid = 0; fid < L.rows.length; fid++) {
+      var k = chiaveWr(val(L, fid, "WR"));
+      if (!k || vecchi.has(k)) continue;
+      var v = {};
+      L.fields.forEach(function (f, i) { v[f] = L.rows[fid][i]; });
+      vecchi.set(k, { g: L.group, v: v, pos: haPos(L, fid) ? [L.xy[2 * fid], L.xy[2 * fid + 1]] : null });
+    }
+  });
+  var ordini = new Map(), righe = o.righe || [];
+  if (o.modo === "aggiungi" || !o.righe) vecchi.forEach(function (x, k) { ordini.set(k, { g: x.g, v: Object.assign({}, x.v), pos: x.pos }); });
+  var conserva = {}, posMan = {};
+  if (o.modo === "nuova") {
+    vecchi.forEach(function (x, k) {
+      var c = {};
+      MB_CAMPI_CONSERVATI.forEach(function (f) { var s = normVal(x.v[f]); if (s) c[f] = s; });
+      if (Object.keys(c).length) conserva[k] = c;
+      if (normVal(x.v.ESITO) === ESITO_MANUALE && x.pos) posMan[k] = x.pos;
+    });
+  }
+  var daFare = [];
+  righe.forEach(function (rec) {
+    var esiste = ordini.get(rec.chiave);
+    if (!esiste) { daFare.push(rec); return; }
+    // AGGIUNGI su un ordine gia' caricato: campi del file, AT se manca; posizione, PTE, CLASSIF e NOTE restano
+    rep.nGia++;
+    var nv = mbValoriRiga(rec), cambiato = false, v = esiste.v;
+    Object.keys(nv).forEach(function (c) { if (normVal(v[c]) !== normVal(nv[c])) { v[c] = nv[c]; cambiato = true; } });
+    if (!normVal(v.AT)) { var at = S.rif.at[chiaveComune(rec.comune || v.COMUNE)]; if (at) { v.AT = at; cambiato = true; } }
+    if (cambiato) rep.nCambiati++;
+    var com = normTxt(rec.comune), ind = normTxt(rec.indirizzo);
+    if ((com && normTxt(v.COMUNE) !== com) || (ind && normTxt(v.INDIRIZZO) !== ind)) rep.indDiverso.push(rec.chiave);
+  });
+  // ordini nuovi: provincia, civico, PTE piu' vicina
+  daFare.forEach(function (rec) {
+    var nv = mbValoriRiga(rec), roe = nv.ROE_TIM, cenWr = mbCentraleWr(rec.centrale), g = null;
+    var vr = roe ? roeIdx[normClli(roe)] : null;
+    if (vr) g = vr.L.group;
+    if (!ctx[g] && cenWr) g = S.rif.centrali[cenWr];
+    if (!ctx[g]) {
+      g = null;
+      [roe, clean(rec.centrale).toUpperCase()].some(function (cod) {
+        var cen = cod ? siglaCentrale(cod) : "";
+        if (cen && ctx[ce.cenGruppo[cen]]) { g = ce.cenGruppo[cen]; return true; }
+        return false;
+      });
+    }
+    if (!g) g = mbGruppoDaSigla(rec.sigla, Object.keys(ctx));
+    if (!g) { var ko = rec.sigla || (roe ? siglaCentrale(roe) : "(senza Roe)"); rep.orfani[ko] = (rep.orfani[ko] || 0) + 1; return; }
+    var c = ctx[g], conta = rep.perGruppo[g] || (rep.perGruppo[g] = { n: 0, PNRR: 0, NO: 0, ND: 0, suRoe: 0, manuale: 0, ko: 0 });
+    var comune = normTxt(rec.comune), indRaw = clean(rec.indirizzo), at = S.rif.at[chiaveComune(comune)] || "";
+    if (comune && !at) rep.senzaAt[comune] = (rep.senzaAt[comune] || 0) + 1;
+    var best = null, tipo = "";
+    if (indRaw) {
+      var sp = splitIndirizzoWr(indRaw), b = cercaCivicoPerTipoWr(c.civ, comune, sp[0], coreStrada(sp[0]), sp[1], sp[2]);
+      best = b[0]; tipo = b[1];
+    }
+    var pRoe = vr ? punto(vr.L, vr.fid) : null, x = NaN, y = NaN, esito, layerCiv = "";
+    var pos = posMan[rec.chiave] ? [posMan[rec.chiave][0], posMan[rec.chiave][1], true] : S.rif.posizioni[rec.chiave];
+    if (best) {
+      x = best.L.xy[2 * best.fid]; y = best.L.xy[2 * best.fid + 1]; layerCiv = best.L.name; esito = CIV_ESITO[tipo] || "CIVICO_TROVATO";
+      if (tipo === CIV_PNRR) conta.PNRR++; else if (tipo === CIV_NO) conta.NO++; else conta.ND++;
+    } else {
+      tipo = "";
+      if (pos && pos[2]) { x = pos[0]; y = pos[1]; esito = ESITO_MANUALE; conta.manuale++; }
+      else if (pRoe) { x = pRoe[1]; y = pRoe[0]; esito = indRaw ? MB_ESITO_SU_ROE : MB_ESITO_SENZA_IND; conta.suRoe++; }
+      else { esito = "NON_TROVATO"; conta.ko++; }
+    }
+    conta.n++; rep.nuovi++;
+    var v = { WR: rec.codice, STATO: nv.STATO, DISPACCIO: nv.DISPACCIO, APPUNTAM: nv.APPUNTAM, PROVINCIA: g, CENTRALE: nv.CENTRALE,
+      COMUNE: comune, AT: at, INDIRIZZO: indRaw, ESITO: esito, TIPO_CIV: tipo, LAYER_CIV: layerCiv,
+      ROE_TIM: roe, IMP_ATTIVO: nv.IMP_ATTIVO, LAVORAZ: nv.LAVORAZ, WR_WFM: nv.WR_WFM };
+    if (!isNaN(x)) {
+      var np = ptePiuVicina(c.pte, x, y);
+      if (np) { var vp = valoriPteMb(np.p.L, np.p.fid); Object.keys(vp).forEach(function (k) { v[k] = vp[k]; }); v.DIST_PTE_M = np.d; }
+    }
+    if (conserva[rec.chiave]) { Object.keys(conserva[rec.chiave]).forEach(function (f) { v[f] = conserva[rec.chiave][f]; }); rep.conservati++; }
+    ordini.set(rec.chiave, { g: g, v: v, pos: isNaN(x) ? null : [x, y] });
+  });
+  // incrocio WR WFM con il predelivery
+  if (o.idxWr) {
+    var ci = { SI: 0, NO: 0, SENZA: 0 };
+    ordini.forEach(function (od) {
+      var wfm = chiaveWr(od.v.WR_WFM), d = wfm ? o.idxWr[wfm] : null;
+      od.v.WR_PRED = !wfm ? MB_WR_SENZA : d ? MB_WR_SI : MB_WR_NO;
+      ci[!wfm ? "SENZA" : d ? "SI" : "NO"]++;
+      MB_WR_CAMPI.forEach(function (x) { od.v[x[0]] = d ? d[x[0]] || "" : ""; });
+    });
+    rep.incrocio = ci;
+  }
+  // ROE TIM e linee, poi i layer
+  var haImp = Object.keys(S.rif.imprese || {}).length, cachePte = {}, perG = {};
+  ordini.forEach(function (od) {
+    var v = od.v, pw = od.pos ? [od.pos[1], od.pos[0]] : null, vr = roeIdx[normClli(v.ROE_TIM)], pRoe = vr ? punto(vr.L, vr.fid) : null;
+    var cf = mbConfronto(v.ROE_TIM, v.ID_PTE, pw, pRoe);
+    v.PTE_DIV = cf[0]; v.DIST_ROE_M = cf[1];
+    if (haImp) v.IMP_ROE = S.rif.imprese[normClli(v.ROE_TIM)] || "";
+    var pp = pw ? puntoPteDi(od.g, normVal(v.ID_PTE), cachePte) : null;
+    var t = perG[od.g] || (perG[od.g] = { punti: [], xy: [], coll: [], lcoll: [], roe: [], lroe: [] });
+    function riga(campi) { return campi.map(function (f) { var x = v[f]; return x === undefined || x === "" ? null : x; }); }
+    t.punti.push(riga(CAMPI_MB)); t.xy.push(od.pos ? od.pos[0] : NaN, od.pos ? od.pos[1] : NaN);
+    if (pw && pp) { t.coll.push(riga(CAMPI_MB_LINEE)); t.lcoll.push([pw, pp]); }
+    if (pw && pRoe && cf[0] === MB_DIV_SI) { t.roe.push(riga(CAMPI_MB_LINEE)); t.lroe.push([pw, pRoe]); }
+  });
+  var uid = "mb:" + Date.now().toString(36) + ":", layers = [];
+  Object.keys(perG).sort().forEach(function (g) {
+    var t = perG[g], ps = nomeFileSicuro(g).toUpperCase();
+    layers.push(nuovoLayer({ name: "ANALISI_MONTEBELLO_" + ps, group: g, kind: "MB", geom: "point", fields: CAMPI_MB.slice(), rows: t.punti,
+      xy: new Float64Array(t.xy), uid: uid + g + "/MB" }));
+    layers.push(nuovoLayer({ name: "MONTEBELLO_COLLEGAMENTI_" + ps, group: g, kind: "MB_COLL", geom: "line", fields: CAMPI_MB_LINEE.slice(),
+      rows: t.coll, xy: new Float64Array(0), lines: t.lcoll, uid: uid + g + "/COLL" }));
+    layers.push(nuovoLayer({ name: "MONTEBELLO_ROE_TIM_" + ps, group: g, kind: "MB_ROE", geom: "line", fields: CAMPI_MB_LINEE.slice(),
+      rows: t.roe, xy: new Float64Array(0), lines: t.lroe, uid: uid + g + "/ROE" }));
+  });
+  rep.ordini = ordini.size;
+  return { layers: layers, rep: rep };
+}
+// i layer MONTEBELLO nuovi prendono il posto dei vecchi, nei gruppi provincia
+function mbSostituisciLayer(nuovi) {
+  return S.gruppi.map(function (g) {
+    var l = g.layers.filter(function (L) { return L.kind !== "MB" && L.kind !== "MB_COLL" && L.kind !== "MB_ROE"; });
+    nuovi.forEach(function (L) { if (L.group === g.nome) l.push(L); });
+    l.sort(function (a, b) { return (ORDINE_KIND[a.kind] - ORDINE_KIND[b.kind]) || (a.name < b.name ? -1 : 1); });
+    return { nome: g.nome, layers: l };
+  });
+}
+function mbConteggi() {
+  var t = { n: 0, div: {}, attivi: 0, armKo: 0, fatt: 0, senzaPos: 0, esito: {}, pred: {} };
+  ordiniMb().forEach(function (x) {
+    var L = x[0], fid = x[1], d = val(L, fid, "PTE_DIV") || "-";
+    t.n++; t.div[d] = (t.div[d] || 0) + 1;
+    if (val(L, fid, "IMP_ATTIVO") === ATTIVI_SI) t.attivi++;
+    if (val(L, fid, "ARM_KO")) t.armKo++;
+    if (val(L, fid, "PTE_FATT")) t.fatt++;
+    if (!haPos(L, fid)) t.senzaPos++;
+    var e = val(L, fid, "ESITO"); t.esito[e] = (t.esito[e] || 0) + 1;
+    var p = val(L, fid, "WR_PRED") || "-"; t.pred[p] = (t.pred[p] || 0) + 1;
+  });
+  return t;
+}
+function mbTestoIncrocio(ci, fonte) {
+  if (!ci) return "Incrocio WR WFM con il predelivery non fatto: " + fonte + ".";
+  return "Incrocio WR WFM con il predelivery (" + fonte + "):\n  ordini con WR WFM: " + (ci.SI + ci.NO) + " -> nel predelivery " + ci.SI +
+    ", non presenti " + ci.NO + "\n  ordini senza WR WFM: " + ci.SENZA;
+}
+
+async function analisiMontebello(fileList) {
+  var f = Array.prototype.slice.call(fileList || [])[0];
+  if (!f) return;
+  var titolo = "Analisi Montebello";
+  statoCar.textContent = "Lettura di " + f.name + "...";
+  var buf, letto;
+  try { buf = await f.arrayBuffer(); letto = await mbLeggiFile(buf, f.name); }
+  catch (err) { statoCar.textContent = ""; avviso("File Montebello non letto: " + err.message); return; }
+  var righe = letto.righe, inf = letto.info;
+  if (inf.mancano.length || inf.avvisi.length || !righe.length) {
+    statoCar.textContent = "";
+    avviso(f.name + ": " + (inf.avvisi.join("; ") || (inf.mancano.length ? "mancano le colonne " + inf.mancano.join(", ") : "nessun ordine nel file")));
+    return;
+  }
+  if (!Object.keys(contestoMb().ctx).length) {
+    statoCar.textContent = "";
+    avviso("Nessun gruppo con layer CIVICI e STRUCTURE (con CLLI_CODE): carica prima la cartella");
+    return;
+  }
+  // AGGIUNGI / NUOVA ANALISI
+  var caricati = new Set(ordiniMb().map(function (x) { return chiaveWr(val(x[0], x[1], "WR")); }));
+  var modo = "nuova";
+  if (caricati.size) {
+    var nGia = righe.filter(function (r) { return caricati.has(r.chiave); }).length;
+    var sc = await dialogo({ titolo: titolo,
+      html: "<p>Nel sito ci sono già <b>" + fmtN(caricati.size) + "</b> ordini Montebello. Nel file: " + fmtN(righe.length) + " ordini, di cui " + fmtN(nGia) + " già caricati.</p>" +
+        "<p><b>Aggiungi</b>: gli ordini nuovi si sommano; quelli già caricati aggiornano stato, sottostato, appuntamento, ROE TIM, clienti attivi e tipo lavorazione e tengono posizione, PTE, classificazione e note.</p>" +
+        "<p><b>Nuova analisi</b>: toglie tutti gli ordini e riparte solo da questo file. Classificazione, note e posizioni messe a mano tornano sugli stessi ordini.</p>",
+      bottoni: [{ id: "aggiungi", testo: "Aggiungi", pri: true }, { id: "nuova", testo: "Nuova analisi" }, { id: "annulla", testo: "Annulla" }] });
+    if (!sc || sc.id === "annulla") { statoCar.textContent = ""; info("Import Montebello annullato"); return; }
+    modo = sc.id;
+  }
+  // v1.8.6: WR del predelivery per l'incrocio con WR WFM
+  var idxWr = null, fonteWr = "il file non ha WR WFM";
+  if (righe.some(function (r) { return chiaveWr(r.wr_wfm); })) {
+    var w = mbIndiceWrLayer();
+    if (w) { idxWr = w[0]; fonteWr = w[1]; }
+    else {
+      var sc2 = await dialogo({ titolo: titolo,
+        html: "<p>Nel sito non ci sono WR della pre-analisi. Per incrociare la colonna WR WFM con il predelivery (squadra, stato, classificazione della WR) scegli il file predelivery, oppure continua senza incrocio.</p>",
+        bottoni: [{ id: "file", testo: "Scegli il predelivery", pri: true, scegli: ".xlsx,.xlsm,.xls", multiplo: true }, { id: "no", testo: "Senza incrocio" }] });
+      if (sc2 && sc2.id === "file" && sc2.files) {
+        statoCar.textContent = "Lettura del predelivery...";
+        try { var wf = await mbIndiceWrFile(sc2.files); idxWr = wf[0]; fonteWr = wf[1]; }
+        catch (err) { fonteWr = "predelivery non letto (" + err.message + ")"; }
+      } else fonteWr = "nessuna WR caricata e nessun predelivery scelto";
+    }
+  }
+  statoCar.textContent = "Analisi di " + fmtN(righe.length) + " ordini...";
+  await tick();
+  var ris;
+  try { ris = mbCostruisci({ righe: righe, modo: modo, idxWr: idxWr }); }
+  catch (err) { statoCar.textContent = ""; avviso("Analisi Montebello non riuscita: " + err.message); return; }
+  impostaDati(mbSostituisciLayer(ris.layers), true);
+  if (!S.cartella) S.cartella = { nome: "file caricati", quando: new Date().toISOString(), voci: [], marcature: {}, preAnalisi: null };
+  S.cartella.montebello = { quando: new Date().toISOString(), file: f.name, foglio: inf.foglio, ordini: ris.rep.ordini, fonteWr: fonteWr };
+  applicaRuolo();
+  await salvaDataset(false);
+  try { await idbOp("readwrite", function (st) { return st.put({ nome: f.name, quando: new Date().toISOString(), buf: buf }, "mbFile"); }); }
+  catch (err) { avviso("File Montebello non salvato nel browser: per l'export andrà reimportato"); }
+  var bb = null;
+  ris.layers.forEach(function (L) { if (L.kind === "MB") for (var i = 0; i < L.rows.length; i++) if (haPos(L, i)) bb = estendi(bb, punto(L, i)); });
+  if (bb) zoomRisultati(bb);
+  statoCar.textContent = "";
+  // riepilogo
+  var rep = ris.rep, tot = mbConteggi(), t = ["File: " + f.name + " (foglio " + inf.foglio + ")",
+    "Ordini nel file: " + fmtN(righe.length) + (inf.doppie ? " (codici ripetuti: " + inf.doppie + ")" : "")];
+  if (inf.assenti.length) t.push("Colonne assenti: " + inf.assenti.join(", "));
+  if (modo === "aggiungi") {
+    t.push("AGGIUNGI: già caricati " + rep.nGia + " (" + rep.nCambiati + " con dati cambiati), nuovi " + rep.nuovi);
+    if (rep.indDiverso.length) t.push("Indirizzo diverso da quello caricato (posizione non ricalcolata): " + rep.indDiverso.length + " - " + rep.indDiverso.slice(0, 10).join(", "));
+  } else t.push("NUOVA ANALISI");
+  var pg = Object.keys(rep.perGruppo).sort();
+  if (pg.length) {
+    t.push("", modo === "aggiungi" ? "Ordini nuovi per provincia:" : "Per provincia:");
+    pg.forEach(function (g) {
+      var c = rep.perGruppo[g];
+      t.push("  " + g + ": " + c.n + " ordini (civico " + (c.PNRR + c.NO + c.ND) + " -> PNRR " + c.PNRR + " / NO PNRR " + c.NO + ", su ROE TIM " + c.suRoe + ", a mano " + c.manuale + ", non trovati " + c.ko + ")");
+    });
+  }
+  t.push("", "Ordini nei layer: " + fmtN(tot.n), "PTE più vicina DIVERSA dalla ROE TIM: " + (tot.div[MB_DIV_SI] || 0), "PTE più vicina uguale alla ROE TIM: " + (tot.div[MB_DIV_NO] || 0));
+  if (tot.div[MB_DIV_ROE_ND]) t.push("ROE TIM non fra le STRUCTURE caricate: " + tot.div[MB_DIV_ROE_ND]);
+  if (tot.div[MB_DIV_SENZA_ROE]) t.push("Ordini senza Roe nel file: " + tot.div[MB_DIV_SENZA_ROE]);
+  if (inf.senzaInd) t.push("Righe senza comune e indirizzo: " + inf.senzaInd + " nel file, " + (tot.esito[MB_ESITO_SENZA_IND] || 0) + " messe sulla ROE TIM");
+  if (tot.senzaPos) t.push("Senza posizione (usa Sposta dalla scheda): " + tot.senzaPos);
+  t.push("Su ROE con almeno 1 cliente attivo: " + tot.attivi);
+  if (tot.armKo) t.push("Su armadi non lavorati: " + tot.armKo);
+  if (tot.fatt) t.push("Su PTE già fatturate: " + tot.fatt);
+  if (rep.conservati) t.push("Classificazione / note riprese dall'analisi precedente: " + rep.conservati);
+  t.push("", mbTestoIncrocio(rep.incrocio, fonteWr));
+  var orf = Object.keys(rep.orfani);
+  if (orf.length) t.push("", "Ordini senza provincia caricata: " + orf.reduce(function (s, k) { return s + rep.orfani[k]; }, 0) + " (" +
+    orf.sort(function (a, b) { return rep.orfani[b] - rep.orfani[a]; }).slice(0, 15).map(function (k) { return k + " " + rep.orfani[k]; }).join(", ") + ")");
+  var sa = Object.keys(rep.senzaAt);
+  if (sa.length) t.push("Comuni senza AT nel file COMUNI X AT: " + sa.length + " (" + sa.slice(0, 10).join(", ") + (sa.length > 10 ? ", ..." : "") + ")");
+  var sc3 = await dialogo({ titolo: titolo + " completata", html: righeTesto(t) + '<p class="nota-imp">Quadrati: ordini; linea verde acqua: PTE più vicina; tratteggio rosso: ROE TIM quando è diversa. Ricerca WR, scheda, Sposta e Associa lavorano anche sugli ordini.</p>',
+    bottoni: [{ id: "esporta", testo: "Esporta Excel", pri: true }, { id: "ok", testo: "Chiudi" }] });
+  if (sc3 && sc3.id === "esporta") mbEsporta();
+}
+
+// riallineo dopo una pre-analisi WR o le STRUCTURE nuove: niente file, ordini tenuti
+async function mbRiallinea(motivo) {
+  if (!layersMb().length) return;
+  var w = mbIndiceWrLayer(), ris = mbCostruisci({ righe: null, modo: "aggiungi", idxWr: w ? w[0] : null });
+  impostaDati(mbSostituisciLayer(ris.layers), true);
+  applicaRuolo();
+  await salvaDataset(false);
+  var tot = mbConteggi();
+  info("Ordini Montebello riallineati (" + motivo + "): " + fmtN(tot.n) + " ordini, PTE diversa dalla ROE TIM " + (tot.div[MB_DIV_SI] || 0) +
+    (ris.rep.incrocio ? ", WR nel predelivery " + ris.rep.incrocio.SI : ""));
+}
+
+// --- ESPORTA EXCEL MONTEBELLO: il file TIM con le colonne dell'analisi in coda ---
+function mbValoriExport() {
+  var out = {};
+  layersMb().forEach(function (L) {
+    for (var fid = 0; fid < L.rows.length; fid++) {
+      var k = chiaveWr(val(L, fid, "WR"));
+      if (!k || out[k]) continue;
+      var v = {};
+      MB_EXPORT_COLONNE.forEach(function (x) {
+        var raw = leggiValore(L, fid, x[0]);
+        if (typeof raw === "number" && isFinite(raw)) v[x[0]] = raw;
+        else { var s = normVal(raw); if (s) v[x[0]] = MB_EXPORT_NUMERICI.indexOf(x[0]) !== -1 && isFinite(+s.replace(",", ".")) ? +s.replace(",", ".") : s; }
+      });
+      out[k] = v;
+    }
+  });
+  return out;
+}
+async function mbFileSalvato() {
+  try { return await idbOp("readonly", function (st) { return st.get("mbFile"); }); } catch (e) { return null; }
+}
+async function mbEsporta() {
+  if (!layersMb().length) { avviso("Nessun ordine Montebello: importa prima il file"); return; }
+  var rec = await mbFileSalvato();
+  if (!rec || !rec.buf) { avviso("Il file Montebello importato non è salvato in questo browser: reimportalo e poi esporta"); return; }
+  var X = await caricaXlsx(), u8 = new Uint8Array(rec.buf);
+  var wb = X.read(u8, { type: "array", cellNF: true, cellDates: false }), t = mbTrovaFoglio(X, wb);
+  if (!t) { avviso("Nel file non trovo più il foglio degli ordini"); return; }
+  var valori = mbValoriExport(), colChiave = {};
+  MB_CHIAVI_ORDINE.forEach(function (k) {
+    for (var i = 0; i < MB_HDR[k].length; i++) { var h = mbNormHdr(MB_HDR[k][i]); if (h in t.perNorm) { colChiave[k] = t.perNorm[h]; return; } }
+  });
+  var prima = t.ultima + 1, perRiga = new Map(), conta = { righe: 0, analizzate: 0, nonIn: 0, diverse: 0 };
+  var iEsito = MB_EXPORT_COLONNE.map(function (x) { return x[0]; }).indexOf("ESITO");
+  perRiga.set(t.hr + 1, MB_EXPORT_COLONNE.map(function (x) { return { v: x[1], s: "h" }; }));
+  for (var r = t.hr + 1; r <= t.rg.e.r; r++) {
+    var q = {};
+    Object.keys(colChiave).forEach(function (k) { q[k] = valoreCella(X, t.ws, r, colChiave[k]); });
+    var k2 = mbCodiceOrdine(q);
+    if (!k2) continue;
+    conta.righe++;
+    var dati = valori[k2], celle = MB_EXPORT_COLONNE.map(function () { return null; });
+    if (!dati) { celle[iEsito] = { v: MB_EXPORT_NON_IN_ANALISI }; conta.nonIn++; }
+    else {
+      conta.analizzate++;
+      MB_EXPORT_COLONNE.forEach(function (x, j) {
+        var v = dati[x[0]];
+        if (v === undefined || v === "") return;
+        var s = MB_EXPORT_NUMERICI.indexOf(x[0]) !== -1 && typeof v === "number" ? "n" : x[0] === "PTE_DIV" && v === MB_DIV_SI ? "div" : null;
+        if (s === "div") conta.diverse++;
+        celle[j] = { v: v, s: s };
+      });
+    }
+    perRiga.set(r + 1, celle);
+  }
+  var nome = rec.nome.replace(/\.(xlsx|xlsm|xls)$/i, ""), ext = /\.xlsm$/i.test(rec.nome) ? ".xlsm" : ".xlsx", out = null, intatto = true;
+  var larghezze = MB_EXPORT_COLONNE.map(function (x) { return Math.max(12, Math.min(30, x[1].length + 4)); });
+  if (!/\.xls$/i.test(rec.nome)) {
+    try { out = (await xlsxConCelle(u8, t.nome, prima, perRiga, larghezze, MB_EXPORT_COLORE_INTEST, MB_EXPORT_COLORE_DIV)).u8; }
+    catch (err) { out = null; console.warn("[MONTEBELLO] export diretto non riuscito:", err); }
+  }
+  if (!out) {
+    // ripiego: SheetJS (dati giusti, ma pivot e formattazione del file non restano)
+    intatto = false; ext = ".xlsx";
+    perRiga.forEach(function (celle, rn) {
+      celle.forEach(function (x, j) { if (x && x.v !== null && x.v !== undefined && x.v !== "") t.ws[X.utils.encode_cell({ r: rn - 1, c: prima + j })] = { t: typeof x.v === "number" ? "n" : "s", v: x.v }; });
+    });
+    var rg = X.utils.decode_range(t.ws["!ref"]);
+    rg.e.c = Math.max(rg.e.c, prima + MB_EXPORT_COLONNE.length - 1);
+    t.ws["!ref"] = X.utils.encode_range(rg);
+    out = new Uint8Array(X.write(wb, { bookType: "xlsx", type: "array" }));
+  }
+  scaricaBin(nome + MB_EXPORT_SUFFISSO + ext, out, MIME_XLSX);
+  info("Export Montebello, foglio " + t.nome + " (colonne dell'analisi da " + colLettere(prima) + "): " + conta.righe + " ordini, analizzati " + conta.analizzate +
+    ", non nei layer (" + MB_EXPORT_NON_IN_ANALISI + ") " + conta.nonIn + ", PTE diversa dalla ROE TIM " + conta.diverse);
+  if (!intatto) avviso("L'Excel è stato rifatto da capo: dati e colonne ci sono, ma pivot e formattazione del file TIM non sono rimasti");
+}
+
+// --- impianti per squadra (v1.8.7 - v1.8.9) ---
+function mbImpiantiPerSquadra() {
+  var per = new Map(), senza = 0;
+  ordiniMb().forEach(function (x) {
+    var L = x[0], fid = x[1], k = chiaveWr(val(L, fid, "WR")), nome = val(L, fid, "WR_SQUADRA"), ks = compatta(nome);
+    if (!k) return;
+    if (!ks) { senza++; return; }
+    var o = per.get(ks) || { nome: nome, ordini: new Map(), esclusi: new Map() };
+    per.set(ks, o);
+    var arm = MB_ESCLUDI_ARMADI_KO ? mbArmadioDaRecuperare(L, fid) : "";
+    if (arm) { o.esclusi.set(k, arm); o.ordini.delete(k); }
+    else if (!o.esclusi.has(k) && !o.ordini.has(k)) o.ordini.set(k, [L, fid]);
+  });
+  return { per: per, senza: senza };
+}
+// Excel della squadra: le colonne del file TIM (se e' salvato) piu' quelle dell'analisi
+async function mbExcelSquadra(ks) {
+  var imp = mbImpiantiPerSquadra().per.get(ks);
+  if (!imp || !imp.ordini.size) { avviso("Nessun impianto Montebello per questa squadra"); return; }
+  var X = await caricaXlsx(), rec = await mbFileSalvato(), valori = mbValoriExport(), aoa = [], nomeFoglio = "ORDINI";
+  var colAn = MB_EXPORT_COLONNE.map(function (x) { return x[1]; });
+  function analisi(k) { var d = valori[k] || {}; return MB_EXPORT_COLONNE.map(function (x) { var v = d[x[0]]; return v === undefined ? "" : v; }); }
+  var fatto = false;
+  if (rec && rec.buf) {
+    try {
+      var wb = X.read(new Uint8Array(rec.buf), { type: "array", cellNF: true, cellDates: false }), t = mbTrovaFoglio(X, wb);
+      if (t) {
+        nomeFoglio = t.nome;
+        var cols = [], colChiave = {};
+        for (var c = t.rg.s.c; c <= t.ultima; c++) cols.push(c);
+        MB_CHIAVI_ORDINE.forEach(function (k) {
+          for (var i = 0; i < MB_HDR[k].length; i++) { var h = mbNormHdr(MB_HDR[k][i]); if (h in t.perNorm) { colChiave[k] = t.perNorm[h]; return; } }
+        });
+        aoa.push(cols.map(function (c2) { return testoCella(valoreCella(X, t.ws, t.hr, c2)); }).concat(colAn));
+        for (var r = t.hr + 1; r <= t.rg.e.r; r++) {
+          var q = {};
+          Object.keys(colChiave).forEach(function (k) { q[k] = valoreCella(X, t.ws, r, colChiave[k]); });
+          var k2 = mbCodiceOrdine(q);
+          if (!k2 || !imp.ordini.has(k2)) continue;
+          aoa.push(cols.map(function (c2) { var v = valoreCella(X, t.ws, r, c2); return v instanceof Date ? testoCella(v) : v === null ? "" : v; }).concat(analisi(k2)));
+        }
+        fatto = aoa.length > 1;
+      }
+    } catch (e) { fatto = false; aoa = []; }
+  }
+  if (!fatto) {
+    // senza il file TIM: i dati dell'ordine dai layer
+    aoa = [["ID ORDINE", "WR WFM", "COMUNE", "INDIRIZZO", "APPUNTAMENTO", "STATO", "ROE TIM", "TIPO LAVORAZIONE"].concat(colAn)];
+    imp.ordini.forEach(function (x, k) {
+      var L = x[0], fid = x[1];
+      aoa.push([k, val(L, fid, "WR_WFM"), val(L, fid, "COMUNE"), val(L, fid, "INDIRIZZO"), val(L, fid, "APPUNTAM"), val(L, fid, "STATO"),
+        val(L, fid, "ROE_TIM"), val(L, fid, "LAVORAZ")].concat(analisi(k)));
+    });
+  }
+  var out = X.utils.book_new(), ws = X.utils.aoa_to_sheet(aoa);
+  ws["!cols"] = aoa[0].map(function (h) { return { wch: Math.max(10, Math.min(30, String(h).length + 4)) }; });
+  X.utils.book_append_sheet(out, ws, nomeFoglio.slice(0, 31));
+  scaricaBin(MB_SQUADRE_FILE + "_" + nomeFileSicuro(imp.nome).toUpperCase() + "_" + oggiCompatto() + ".xlsx", new Uint8Array(X.write(out, { bookType: "xlsx", type: "array" })), MIME_XLSX);
+}
+function mbFinestraSquadre() {
+  var r = mbImpiantiPerSquadra(), voci = Array.from(r.per.entries()).sort(function (a, b) { return b[1].ordini.size - a[1].ordini.size; });
+  var rub = {};
+  (CONFIG.elenchi.squadre || []).forEach(function (s) { rub[compatta(s.codice)] = s.mail || ""; });
+  var h = "<p>Un Excel per squadra con i suoi impianti (squadra della WR nel predelivery). Le squadre vedono gli stessi impianti nel sito, entrando con il loro accesso." +
+    (MB_ESCLUDI_ARMADI_KO ? " Gli impianti sugli armadi da recuperare restano fuori." : "") + "</p>";
+  if (!voci.length) h += '<p class="vuoto">Nessun ordine con la squadra della WR: serve l\'incrocio con il predelivery (WR WFM).</p>';
+  else {
+    h += '<div class="mon-scroll"><table class="dlg-tab"><thead><tr><th>Squadra</th><th class="n">Impianti</th><th class="n">Esclusi</th><th>Mail in rubrica</th><th></th></tr></thead><tbody>';
+    voci.forEach(function (e, i) {
+      h += "<tr><td>" + esc(e[1].nome) + '</td><td class="n num">' + e[1].ordini.size + '</td><td class="n num"' +
+        (e[1].esclusi.size ? ' title="' + esc(Array.from(new Set(e[1].esclusi.values())).join(", ")) + '"' : "") + ">" + (e[1].esclusi.size || "") + "</td><td><small>" +
+        esc(rub[e[0]] || "non in rubrica") + '</small></td><td>' + (e[1].ordini.size ? '<button type="button" class="lnk" data-sq="' + i + '">Excel</button>' : "") + "</td></tr>";
+    });
+    h += "</tbody></table></div>";
+  }
+  if (r.senza) h += '<p class="nota-imp">' + r.senza + " impianti senza squadra (WR non nel predelivery o senza WR WFM) restano fuori.</p>";
+  dialogo({ titolo: "Montebello: Excel per squadra", html: h, bottoni: [{ id: "ok", testo: "Chiudi", pri: true }],
+    apri: function (corpo) {
+      corpo.querySelectorAll("[data-sq]").forEach(function (b) { b.onclick = function () { mbExcelSquadra(voci[+b.dataset.sq][0]); }; });
+    } });
+}
+
+// --- pannello: riepilogo per master e assistenti ---
+function selezionaOrdini(filtro, meta) {
+  var perL = new Map(), bb = null;
+  S.layers.forEach(function (L) { if (L.kind === "MB") L.sel = new Set(); });
+  ordiniMb(filtro).forEach(function (x) {
+    if (!perL.has(x[0])) perL.set(x[0], []);
+    perL.get(x[0]).push(x[1]); x[0].sel.add(x[1]); bb = estendi(bb, punto(x[0], x[1]));
+  });
+  zoomRisultati(bb);
+  mostraRisultati({ gruppi: Array.from(perL.entries()).map(function (e) { return { L: e[0], ids: e[1], tot: e[1].length }; }), meta: meta }, "WR");
+  disegna();
+}
+function aggiornaMbBlocco() {
+  var box = document.getElementById("blkMb");
+  if ((ruolo() !== "master" && ruolo() !== "assistente") || !layersMb().length) { box.hidden = true; return; }
+  box.hidden = false;
+  var t = mbConteggi(), m = S.cartella && S.cartella.montebello;
+  var voci = [["div", "PTE più vicina diversa dalla ROE TIM", t.div[MB_DIV_SI] || 0, function (L, f) { return val(L, f, "PTE_DIV") === MB_DIV_SI; }],
+    ["roe", "ROE TIM non in mappa", t.div[MB_DIV_ROE_ND] || 0, function (L, f) { return val(L, f, "PTE_DIV") === MB_DIV_ROE_ND; }],
+    ["arm", "Su armadi da recuperare", ordiniMb(function (L, f) { return !!mbArmadioDaRecuperare(L, f); }).length, function (L, f) { return !!mbArmadioDaRecuperare(L, f); }],
+    ["pred", "WR non nel predelivery", t.pred[MB_WR_NO] || 0, function (L, f) { return val(L, f, "WR_PRED") === MB_WR_NO; }]];
+  var h = '<table class="avz"><tbody><tr class="tot"><td>Ordini' + (m ? "<small>" + esc(m.file) + ", " + new Date(m.quando).toLocaleDateString("it-IT") + "</small>" : "") +
+    '</td><td class="n num">' + fmtN(t.n) + "</td></tr>";
+  voci.forEach(function (v, i) {
+    h += "<tr><td>" + (v[2] ? '<button type="button" class="lnk" data-mb="' + i + '">' + esc(v[1]) + "</button>" : esc(v[1])) + '</td><td class="n num">' + fmtN(v[2]) + "</td></tr>";
+  });
+  if (t.senzaPos) h += '<tr><td>Senza posizione</td><td class="n num">' + fmtN(t.senzaPos) + "</td></tr>";
+  document.getElementById("mbRiep").innerHTML = h + "</tbody></table>";
+  document.querySelectorAll("#mbRiep [data-mb]").forEach(function (b) {
+    b.onclick = function () { var v = voci[+b.dataset.mb]; selezionaOrdini(v[3], v[2] + " ordini: " + v[1].toLowerCase()); };
+  });
+}
+
+// --- la squadra: i suoi impianti Montebello, nuovi e gia' visti ---
+S.filtroMb = "tutti";
+function mbChiaveVisto(L, fid) { return [chiaveWr(val(L, fid, "WR")), compatta(val(L, fid, "WR_SQUADRA")), mbDataChiave(val(L, fid, "APPUNTAM"))].join("|"); }
+function mbSegnaVisti(lista) {
+  var v = leggiLS("mbVisti", {}), ora = new Date().toISOString(), n = 0;
+  lista.forEach(function (x) { var k = mbChiaveVisto(x[0], x[1]); if (!v[k]) { v[k] = ora; n++; } });
+  if (n) scriviLS("mbVisti", v);
+  return n;
+}
+function aggiornaMbSquadra() {
+  var box = document.getElementById("blkMbSq");
+  if (ruolo() !== "squadra" || !layersMb().length) { box.hidden = true; return; }
+  var mie = ordiniMb(function (L, fid) { return visibileFid(L, fid); });
+  if (!mie.length) { box.hidden = true; return; }
+  box.hidden = false;
+  var visti = leggiLS("mbVisti", {}), nuovo = function (x) { return !visti[mbChiaveVisto(x[0], x[1])]; };
+  var nNuovi = mie.filter(nuovo).length;
+  document.getElementById("mbSqMeta").textContent = mie.length + " impiant" + (mie.length === 1 ? "o" : "i") + (nNuovi ? ", " + nNuovi + " nuov" + (nNuovi === 1 ? "o" : "i") : "");
+  document.getElementById("mbSqFiltri").innerHTML = [["tutti", "Tutti", mie.length], ["nuovi", "Nuovi", nNuovi]].map(function (f) {
+    return '<button type="button" class="filtro' + (S.filtroMb === f[0] ? " sel" : "") + '" data-f="' + f[0] + '">' + f[1] + ' <span class="num">' + f[2] + "</span></button>";
+  }).join("");
+  document.querySelectorAll("#mbSqFiltri [data-f]").forEach(function (b) { b.onclick = function () { S.filtroMb = b.dataset.f; aggiornaMbSquadra(); }; });
+  var lista = mie.filter(function (x) { return S.filtroMb !== "nuovi" || nuovo(x); })
+    .sort(function (a, b) { return dataOrd(val(a[0], a[1], "APPUNTAM")) < dataOrd(val(b[0], b[1], "APPUNTAM")) ? -1 : 1; });
+  var h = lista.length ? "" : '<p class="vuoto">Nessun impianto nuovo.</p>';
+  lista.forEach(function (x, i) {
+    var L = x[0], fid = x[1];
+    h += '<li><button class="ris-voce sq" type="button" data-i="' + i + '"><span class="pt" style="border-radius:2px;background:' + esc(categoria(L, fid).colore) + '"></span><b>' +
+      esc(val(L, fid, "WR")) + (nuovo(x) ? ' <span class="pill nuovo">Nuovo</span>' : "") + (val(L, fid, "PTE_DIV") === MB_DIV_SI ? ' <span class="pill">PTE diversa da ROE TIM</span>' : "") +
+      "</b><small>" + esc([val(L, fid, "INDIRIZZO"), val(L, fid, "COMUNE")].filter(Boolean).join(", ")) +
+      (val(L, fid, "APPUNTAM") ? "<br>Appuntamento " + esc(val(L, fid, "APPUNTAM")) : "") + (val(L, fid, "WR_WFM") ? ", WR " + esc(val(L, fid, "WR_WFM")) : "") +
+      (haPos(L, fid) ? "" : "<br>senza posizione") + "</small></button></li>";
+  });
+  var ul = document.getElementById("mbSqLista");
+  ul.innerHTML = h;
+  ul.querySelectorAll("[data-i]").forEach(function (b) {
+    b.onclick = function () {
+      var x = lista[+b.dataset.i], p = punto(x[0], x[1]);
+      if (p) vai(p, Math.max(map.getZoom(), zoomPerScala(CERCA_SCALA_PUNTO, p[0])));
+      apriScheda(x[0], x[1], []);
+    };
+  });
+  document.getElementById("mbSqVisti").disabled = !nNuovi;
+}
+document.getElementById("mbSqVisti").onclick = function () {
+  var n = mbSegnaVisti(ordiniMb(function (L, fid) { return visibileFid(L, fid); }));
+  if (n) info(n + " impiant" + (n === 1 ? "o segnato" : "i segnati") + " come visti");
+  aggiornaMbSquadra();
+};
+document.getElementById("mbSqExcel").onclick = function () { if (S.utente) mbExcelSquadra(compatta(S.utente.squadra || "")); };
+document.getElementById("mbEsporta").onclick = function () { mbEsporta(); };
+document.getElementById("mbSquadre").onclick = mbFinestraSquadre;
+
+// =====================================================================
+// CREA STRUCTURE MANCANTI dal proforma PTE (v1.9.0 dello script): solo le
+// PTE il cui CLLI non e' gia' in una STRUCTURE, aggiunte alla STRUCTURE
+// della loro provincia. Nel sito restano nei dati di questo browser
+// (gli shapefile sul disco non cambiano).
+// =====================================================================
+var ST_SHEET_NAME = "pte coordinate corrette", ST_KEY_HEADER = "clli";
+var ST_COL = {
+  elim: ["elim"], tipo: ["tipo roe"], centrale: ["centrale"], armadio: ["armadio"], comune: ["comune"], provincia: ["provincia"],
+  lat: ["lat", "latitudine"], long: ["long", "longitudine", "lon"], tratta: ["tratta secondaria"]
+};
+var TYPE_ROE_MAP = { "ROE MURO": "ROE_PTE_MURO", "ROE INTERNO": "ROE_PTE_INT", "ROE MURO INT": "ROE_PTE_MURO_INT", "ROE A MURO INTERNO": "ROE_PTE_MURO_INT",
+  "ROE SOTTERRANEO": "ROE_PTE_SOTT", "ROE SOTT": "ROE_PTE_SOTT", "ROE PALO": "ROE_PTE_PALO", "ROE BUSINESS": "ROE_BUS" };
+var TYPE_ROE_DEFAULT = "ROE_PTE_MURO", TYPE_ROE_BUSINESS = "ROE_BUS";
+var ST_VALORI_FISSI = [["ROE_TYPE", "TERMINALE"], ["CATEGORY_N", "OTTICO"], ["LOTTO", "1GL3"], ["CUP", "B57G21000250004"]];
+var ST_RIQUADRO = [35.0, 48.0, 6.0, 19.0];
+var ST_CAMPO_ID = "OBJECTID";
+S.aggiunte = {};   // uid del layer STRUCTURE -> [{campi, x, y}]
+
+function stTilabelTratta(tratta) {
+  var s = clean(tratta);
+  if (!s || s.indexOf("/") === -1) return "";
+  var seg = s.split("/").slice(1).join("/").trim().replace(/D\d+$/i, "").trim();
+  return seg ? seg.replace(/\d+/g, function (m) { return stripZeri(m); }) : "";
+}
+function stCentraleArmadio(tratta) {
+  var m = /^([^-/]+)-[A-Za-z]-(\d+)\s*\//.exec(clean(tratta));
+  return m ? [m[1].trim(), m[2].trim()] : ["", ""];
+}
+function stTrattaSecondaria(tratta) {
+  var s = clean(tratta);
+  if (!s) return ["", "", ""];
+  var parti = s.split("-"), sep = parti.length > 1 ? parti[1].trim().toUpperCase() : "";
+  if (sep === "S") return [parti[0].trim(), s.slice(s.indexOf("-") + 1).trim(), "S"];
+  return ["", "", sep === "A" ? "A" : ""];
+}
+function stCoord(v) {
+  var s = clean(v);
+  if (!s) return null;
+  var m = /^(\d+)-(\d+)-(\d+(?:[.,]\d+)?)$/.exec(s);
+  if (m) return +m[1] + m[2] / 60 + parseFloat(m[3].replace(",", ".")) / 3600;
+  var n = Number(s.replace(",", "."));
+  return isFinite(n) ? n : null;
+}
+function stTipoRoe(tipo) {
+  var t = clean(tipo).toUpperCase();
+  if (TYPE_ROE_MAP[t]) return [TYPE_ROE_MAP[t], ""];
+  if (t.indexOf("BUSINESS") !== -1) return [TYPE_ROE_BUSINESS, "business"];
+  return [TYPE_ROE_DEFAULT, t ? "ignoto" : ""];
+}
+function stValoriRiga(valore, codice) {
+  var v = { CLLI_CODE: codice, STRUCTURE_: codice }, tratta = valore("tratta"), centrale = valore("centrale"), armadio = valore("armadio");
+  var ts = stTrattaSecondaria(tratta), til;
+  if (ts[2] === "S") {
+    v.MAIN_SUB_1 = ts[0];
+    v.CENTRALE = (ts[0].indexOf("_") !== -1 ? ts[0].split("_")[0] : centrale) || centrale;
+    til = ts[1];
+  } else {
+    if (!centrale || !armadio) { var ca = stCentraleArmadio(tratta); centrale = centrale || ca[0]; armadio = armadio || ca[1]; }
+    var ms1 = "";
+    if (centrale && armadio) {
+      var n = Number(armadio);
+      if (isFinite(n)) { n = Math.trunc(n); ms1 = centrale + "_" + (n >= 0 && n < 10 ? "0" : "") + n; }
+      else ms1 = centrale + "_" + armadio;
+    }
+    v.MAIN_SUB_1 = ms1; v.CENTRALE = centrale;
+    til = stTilabelTratta(tratta);
+  }
+  v.TILABEL = til;
+  var tr = stTipoRoe(valore("tipo"));
+  v.TYPE_NAME = tr[0];
+  v.COMUNE = valore("comune");
+  ST_VALORI_FISSI.forEach(function (x) { v[x[0]] = x[1]; });
+  return [v, tr[1]];
+}
+function stGruppoProvincia(valore, gruppi) {
+  var s = clean(valore).toUpperCase();
+  if (!s) return null;
+  var nome = normTxt(MB_SIGLE_PROVINCIA[s] || normProvincia(s));
+  if (!nome) return null;
+  var ord = gruppi.slice().sort();
+  return ord.filter(function (g) { return normTxt(g) === nome; })[0] || ord.filter(function (g) { return normTxt(g).indexOf(nome) !== -1; })[0] ||
+    ord.filter(function (g) { var gn = normTxt(g); return gn.length >= 4 && nome.indexOf(gn) !== -1; })[0] || null;
+}
+function layersStructure() { return S.layers.filter(function (L) { return L.kind === "STRUCTURE"; }); }
+function aggiungiPunti(L, nuovi) {
+  var xy = new Float64Array(L.xy.length + 2 * nuovi.length);
+  xy.set(L.xy);
+  nuovi.forEach(function (p, i) { xy[L.xy.length + 2 * i] = p[0]; xy[L.xy.length + 2 * i + 1] = p[1]; });
+  L.xy = xy;
+}
+// le PTE aggiunte entrano nel layer (all'apertura e dopo la creazione)
+function applicaAggiunte(L, lista) {
+  if (!lista || !lista.length) return 0;
+  lista.forEach(function (a) { Object.keys(a.campi).forEach(function (c) { aggiungiCampo(L, c); }); });
+  lista.forEach(function (a) { L.rows.push(L.fields.map(function (f) { var v = a.campi[f]; return v === undefined || v === "" ? null : v; })); });
+  aggiungiPunti(L, lista.map(function (a) { return [a.x, a.y]; }));
+  L.cache = {};
+  costruisciGriglia(L);
+  return lista.length;
+}
+async function salvaAggiunte() {
+  try { await idbOp("readwrite", function (st) { return st.put(S.aggiunte, "aggiunte"); }); }
+  catch (err) { avviso("PTE aggiunte non salvate nel browser (" + err.message + ")"); }
+}
+function contaAggiunte() { var n = 0; Object.keys(S.aggiunte || {}).forEach(function (k) { n += S.aggiunte[k].length; }); return n; }
+function csvAggiunte() {
+  var righe = [["GRUPPO", "LAYER", "OBJECTID", "CLLI_CODE", "MAIN_SUB_1", "CENTRALE", "TILABEL", "TYPE_NAME", "COMUNE", "LAT", "LON"]];
+  S.layers.forEach(function (L) {
+    (S.aggiunte[L.uid] || []).forEach(function (a) {
+      var c = a.campi;
+      righe.push([L.group, L.name, c.OBJECTID, c.CLLI_CODE, c.MAIN_SUB_1, c.CENTRALE, c.TILABEL, c.TYPE_NAME, c.COMUNE, a.y.toFixed(7), a.x.toFixed(7)]);
+    });
+  });
+  scarica("PTE_AGGIUNTE_DAL_PROFORMA_" + oggiCompatto() + ".csv", csv(righe, ";"));
+}
+
+async function creaStructureMancanti(fileList) {
+  var f = Array.prototype.slice.call(fileList || [])[0];
+  if (!f) return;
+  var titolo = "Crea STRUCTURE mancanti";
+  var info0 = layersStructure();
+  if (!info0.length) { avviso("Nessun layer STRUCTURE caricato: prima la cartella RESA DELIVERY"); return; }
+  statoCar.textContent = "Lettura del proforma " + f.name + "...";
+  var fogli;
+  try { fogli = await leggiExcel(f, [ST_SHEET_NAME]); } catch (err) { statoCar.textContent = ""; avviso("Proforma non letto: " + err.message); return; }
+  statoCar.textContent = "";
+  var foglio = fogli[0], righe = foglio.righe;
+  if (foglio.nome !== ST_SHEET_NAME) avviso("Foglio '" + ST_SHEET_NAME + "' non trovato: uso '" + foglio.nome + "'");
+  var hr = rigaIntestazione(righe, ST_KEY_HEADER);
+  if (hr === -1) { avviso("Non trovo '" + ST_KEY_HEADER + "' nelle prime " + SEARCH_ROWS + " righe del foglio '" + foglio.nome + "'"); return; }
+  var col = {};
+  righe[hr].forEach(function (c, i) { var k = clean(c).toLowerCase(); if (k && !(k in col)) col[k] = i; });
+  // CLLI gia' presenti e centrale -> gruppo dalle PTE caricate
+  var presenti = new Set(), cenGruppo = {};
+  info0.forEach(function (L) {
+    for (var i = 0; i < L.rows.length; i++) {
+      var k = normClli(val(L, i, "CLLI_CODE"));
+      if (!k) continue;
+      presenti.add(k);
+      if (!(siglaCentrale(k) in cenGruppo)) cenGruppo[siglaCentrale(k)] = L.group;
+    }
+  });
+  var gruppi = S.gruppi.filter(function (g) { return g.layers.some(function (L) { return L.kind === "STRUCTURE"; }); }).map(function (g) { return g.nome; });
+  var perGruppo = {}, conta = { righe: 0, doppie: 0, elim: 0, presenti: 0, coord: 0, senzaProv: 0, business: 0, ignoti: 0, tilVuoti: 0 };
+  var senzaProv = {}, tipiIgnoti = new Set(), visti = new Set(), R = ST_RIQUADRO;
+  righe.slice(hr + 1).forEach(function (r) {
+    function valore(chiave) {
+      for (var i = 0; i < ST_COL[chiave].length; i++) { var j = col[ST_COL[chiave][i]]; if (j !== undefined) { var v = clean(r[j]); if (v) return v; } }
+      return "";
+    }
+    var codice = clean(r[col[ST_KEY_HEADER]]), k = normClli(codice);
+    if (!k) return;
+    conta.righe++;
+    if (visti.has(k)) { conta.doppie++; return; }
+    visti.add(k);
+    if (valore("elim")) { conta.elim++; return; }
+    if (presenti.has(k)) { conta.presenti++; return; }
+    var y = stCoord(valore("lat")), x = stCoord(valore("long"));
+    if (x === null || y === null || !(R[0] <= y && y <= R[1]) || !(R[2] <= x && x <= R[3])) { conta.coord++; return; }
+    var vv = stValoriRiga(valore, codice), v = vv[0], nota = vv[1];
+    var provTxt = valore("provincia"), g = stGruppoProvincia(provTxt, gruppi), cen = siglaCentrale(v.CENTRALE || codice);
+    if (!g && cen) g = stGruppoProvincia(S.rif.centrali[cen] || "", gruppi);
+    if (!g) g = cenGruppo[cen] || null;
+    if (!g) { conta.senzaProv++; var ks = provTxt || "(vuota, centrale " + (cen || "-") + ")"; senzaProv[ks] = (senzaProv[ks] || 0) + 1; return; }
+    if (nota === "business") conta.business++;
+    else if (nota === "ignoto") { conta.ignoti++; tipiIgnoti.add(valore("tipo").toUpperCase()); }
+    if (!v.TILABEL) conta.tilVuoti++;
+    (perGruppo[g] = perGruppo[g] || []).push({ codice: codice, v: v, x: x, y: y });
+  });
+  var nNuove = 0;
+  Object.keys(perGruppo).forEach(function (g) { nNuove += perGruppo[g].length; });
+  var t = ["File: " + f.name + " (foglio " + foglio.nome + ")", "Righe con CLLI: " + conta.righe, "Già nel progetto: " + conta.presenti];
+  var scarti = [["elim", "elim"], ["doppie", "CLLI ripetuti"], ["coord", "coordinate non valide"], ["senzaProv", "provincia non caricata"]]
+    .filter(function (x) { return conta[x[0]]; }).map(function (x) { return x[1] + " " + conta[x[0]]; });
+  if (scarti.length) t.push("Scartate: " + scarti.join(", "));
+  var sp = Object.keys(senzaProv).sort();
+  if (sp.length) t.push("  province non caricate: " + sp.map(function (p) { return p + " " + senzaProv[p]; }).join(", "));
+  t.push("Da aggiungere: " + nNuove);
+  if (conta.tilVuoti) t.push("  di cui con TILABEL vuoto (tratta secondaria vuota): " + conta.tilVuoti);
+  if (conta.ignoti) t.push("  di cui tipo roe non mappato -> " + TYPE_ROE_DEFAULT + ": " + conta.ignoti + " (" + Array.from(tipiIgnoti).sort().join(", ") + ")");
+  if (!nNuove) { dialogo({ titolo: titolo, html: "<p>Nessuna PTE da aggiungere.</p>" + righeTesto(t) }); return; }
+  // finestra: per provincia il layer di destinazione (proposto e ricordato)
+  var ricordati = leggiLS("stLayer", {}), gs = Object.keys(perGruppo).sort();
+  var h = righeTesto(t) + '<table class="dlg-tab"><thead><tr><th>Provincia</th><th class="n">Nuove</th><th>STRUCTURE di destinazione</th></tr></thead><tbody>';
+  gs.forEach(function (g, i) {
+    var cand = info0.filter(function (L) { return L.group === g; }).sort(function (a, b) { return b.rows.length - a.rows.length; });
+    var scelto = cand.filter(function (L) { return L.name === ricordati[g]; })[0] || cand[0];
+    h += "<tr><td>" + esc(g) + '</td><td class="n num">' + perGruppo[g].length + '</td><td><select data-g="' + i + '">' +
+      cand.map(function (L) { return '<option value="' + esc(L.id) + '"' + (L === scelto ? " selected" : "") + ">" + esc(nomeLayer(L)) + " (" + fmtN(L.rows.length) + ")</option>"; }).join("") +
+      '<option value="">(non aggiungere)</option></select></td></tr>';
+  });
+  h += '</tbody></table><p class="nota-imp">Le PTE entrano nei dati di questo browser, con impresa, collaudo, impianto attivo, fatturazione e armadi come le altre. Gli shapefile sul disco restano come sono: rileggendo la cartella spariscono, per questo dopo puoi scaricarle in CSV.</p>';
+  var scelte = {};
+  var sc = await dialogo({ titolo: titolo, html: h, bottoni: [{ id: "ok", testo: "Aggiungi le PTE", pri: true }, { id: "annulla", testo: "Annulla" }],
+    apri: function (corpo) {
+      function leggi() {
+        var n = 0;
+        corpo.querySelectorAll("[data-g]").forEach(function (s) { var g = gs[+s.dataset.g]; scelte[g] = s.value; if (s.value) n += perGruppo[g].length; });
+        var b = document.querySelector("#dlgPiede .btn-pri");
+        b.textContent = "Aggiungi " + n + " PTE"; b.disabled = !n;
+      }
+      corpo.querySelectorAll("[data-g]").forEach(function (s) { s.onchange = leggi; });
+      leggi();
+    } });
+  if (!sc || sc.id !== "ok") { info("Crea STRUCTURE annullato"); return; }
+  var fatte = [], totale = 0;
+  gs.forEach(function (g) {
+    var L = S.layers.filter(function (x) { return x.id === scelte[g]; })[0];
+    if (!L) return;
+    ricordati[g] = L.name;
+    var iId = campoIdx(L, ST_CAMPO_ID), massimo = 0, numerico = false;
+    if (iId !== -1) {
+      for (var i = 0; i < L.rows.length; i++) {
+        var raw = L.rows[i][iId];
+        if (raw === null || raw === undefined || raw === "") continue;
+        if (typeof raw === "number") numerico = true;
+        var n = Math.trunc(parseFloat(String(raw).replace(",", ".")));
+        if (isFinite(n)) massimo = Math.max(massimo, n);
+      }
+    }
+    var lista = perGruppo[g].map(function (p) {
+      var campi = {};
+      Object.keys(p.v).forEach(function (c) { if (campoIdx(L, c) !== -1 && p.v[c] !== "") campi[c] = p.v[c]; });
+      if (iId !== -1) { massimo++; campi[L.fields[iId]] = numerico ? massimo : String(massimo); }
+      return { campi: campi, x: p.x, y: p.y };
+    });
+    var n0 = L.rows.length;
+    applicaAggiunte(L, lista);
+    fatte.push([g, L, n0, lista]);
+    totale += lista.length;
+  });
+  scriviLS("stLayer", ricordati);
+  if (!fatte.length) { avviso("Nessun layer di destinazione scelto: niente aggiunto"); return; }
+  // impresa, collaudo, impianto attivo, fatturate e armadi anche sulle PTE nuove
+  marcaStructure();
+  fatte.forEach(function (x) {
+    var L = x[1], lista = S.aggiunte[L.uid] || (S.aggiunte[L.uid] = []);
+    for (var fid = x[2]; fid < L.rows.length; fid++) {
+      var campi = {};
+      L.fields.forEach(function (c, i) { var v = L.rows[fid][i]; if (v !== null && v !== undefined && v !== "") campi[c] = v; });
+      lista.push({ campi: campi, x: L.xy[2 * fid], y: L.xy[2 * fid + 1] });
+    }
+  });
+  if (S.cartella) S.cartella.proforma = { quando: new Date().toISOString(), file: f.name };
+  await salvaAggiunte();
+  await salvaDataset(false);
+  costruisciPannelloLayer();
+  ridisegnaTutto();
+  disegnaCartella();
+  if (layersMb().length) await mbRiallinea("PTE nuove dal proforma");
+  var r2 = ["PTE aggiunte: " + totale];
+  fatte.forEach(function (x) { r2.push("  " + x[0] + " -> " + nomeLayer(x[1]) + ": " + x[3].length); });
+  var fuori = gs.filter(function (g) { return !fatte.some(function (x) { return x[0] === g; }); });
+  if (fuori.length) r2.push("Province lasciate fuori: " + fuori.join(", "));
+  r2.push("", "Ricorda: CAPACITY / NMU con LA MANO DI DIO opzione 2.");
+  var sc2 = await dialogo({ titolo: titolo, html: righeTesto(r2), bottoni: [{ id: "csv", testo: "Scarica CSV delle PTE aggiunte", pri: true }, { id: "ok", testo: "Chiudi" }] });
+  if (sc2 && sc2.id === "csv") csvAggiunte();
+}
+async function togliAggiunte() {
+  S.aggiunte = {};
+  try { await idbOp("readwrite", function (st) { return st.delete("aggiunte"); }); } catch (e) { /* niente */ }
+  if (S.cartella) delete S.cartella.proforma;
+  var ok = await caricaDataset().catch(function () { return false; });
+  if (ok) { applicaRuolo(); disegna(); }
+  info("PTE del proforma tolte dai dati di questo browser");
+}
+
+// =====================================================================
+// VELINA CATASTALE: WMS dell'Agenzia delle Entrate sopra lo sfondo, come
+// il gruppo PARTICELLE CATASTALI del progetto QGIS
+// =====================================================================
+var CATASTO_URL = "https://wms.cartografia.agenziaentrate.gov.it/inspire/wms/ows01.php";
+var CATASTO_LIVELLI = [
+  ["Cartografia_Catastale", "Cartografia catastale"], ["CP.CadastralParcel", "Particelle"], ["fabbricati", "Fabbricati"],
+  ["vestizioni", "Vestizioni"], ["codice_plla", "Codice particella"], ["simbolo_graffa", "Simbolo graffa"]
+];
+var CATASTO_SCALA = 5000;      // il servizio disegna particelle e fabbricati sotto 1:5.000 circa
+var CATASTO_ZOOM_MIN = 15;
+map.createPane("p-cat").style.zIndex = 300;
+map.getPane("p-cat").style.pointerEvents = "none";
+// il servizio non da' Web Mercator: si chiede ogni tessera in coordinate
+// geografiche (RDN2008, asse lat/lon nel WMS 1.3.0) e si stende sulla tessera
+var WmsGeo = L.TileLayer.WMS.extend({
+  getTileUrl: function (coords) {
+    var nwse = this._tileCoordsToNwSe(coords), nw = nwse[0], se = nwse[1];
+    var url = L.TileLayer.prototype.getTileUrl.call(this, coords);
+    return url + L.Util.getParamString(this.wmsParams, url, this.options.uppercase) +
+      (this.options.uppercase ? "&BBOX=" : "&bbox=") + [se.lat, nw.lng, nw.lat, se.lng].join(",");
+  }
+});
+S.catasto = unisci({ on: false, livelli: ["CP.CadastralParcel"], opacita: 0.85 }, leggiLS("catasto", undefined));
+var lyCatasto = null, catasto = { ok: 0, ko: 0, avvisato: false };
+function livelliCatasto() {
+  return CATASTO_LIVELLI.map(function (x) { return x[0]; }).filter(function (id) { return S.catasto.livelli.indexOf(id) !== -1; });
+}
+function aggiornaCatasto() {
+  var c = S.catasto, liv = livelliCatasto();
+  if (!c.on || !liv.length) {
+    if (lyCatasto) { map.removeLayer(lyCatasto); lyCatasto = null; }
+  } else if (!lyCatasto) {
+    catasto = { ok: 0, ko: 0, avvisato: false };
+    lyCatasto = new WmsGeo(CATASTO_URL, {
+      layers: liv.join(","), styles: "", format: "image/png", transparent: true, version: "1.3.0", crs: { code: "EPSG:6706" },
+      tileSize: 512, minZoom: CATASTO_ZOOM_MIN, maxZoom: 21, opacity: c.opacita, pane: "p-cat", updateWhenZooming: false,
+      attribution: "Cartografia catastale &copy; Agenzia delle Entrate (CC BY 4.0)"
+    });
+    lyCatasto.on("tileload", function () { catasto.ok++; });
+    lyCatasto.on("tileerror", function () {
+      catasto.ko++;
+      if (!catasto.avvisato && catasto.ko >= 8 && !catasto.ok) {
+        catasto.avvisato = true;
+        avviso("La velina catastale non si carica: il servizio dell'Agenzia delle Entrate non risponde, oppure questa pagina blocca le mappe esterne.");
+      }
+    });
+    lyCatasto.addTo(map);
+  } else {
+    lyCatasto.setParams({ layers: liv.join(",") });
+    lyCatasto.setOpacity(c.opacita);
+  }
+  scriviLS("catasto", c);
+  disegnaCatasto();
+}
+function disegnaCatasto() {
+  var c = S.catasto, on = c.on && livelliCatasto().length > 0;
+  var cb = document.getElementById("catOn");
+  cb.checked = !!c.on;
+  document.querySelectorAll("[data-cat]").forEach(function (b) { b.classList.toggle("sel", on); b.setAttribute("aria-pressed", String(on)); });
+  document.getElementById("catOpacita").value = c.opacita;
+  document.getElementById("catOpVal").textContent = Math.round(c.opacita * 100) + "%";
+  var nota = document.getElementById("catNota"), sc = scalaCorrente();
+  if (!on) nota.textContent = "Agenzia delle Entrate, come il gruppo PARTICELLE CATASTALI del progetto QGIS.";
+  else if (sc > CATASTO_SCALA * 1.6) nota.textContent = "Avvicinati: particelle e fabbricati si vedono sotto 1:" + fmtN(CATASTO_SCALA) + " circa (ora 1:" + fmtN(Math.round(sc)) + ").";
+  else nota.textContent = "Agenzia delle Entrate (CC BY 4.0). Le immagini arrivano dal servizio pubblico: da vicino possono servire alcuni secondi.";
+}
+(function () {
+  document.getElementById("catLivelli").innerHTML = CATASTO_LIVELLI.map(function (x, i) {
+    return '<div class="lay-riga"><input type="checkbox" id="catL' + i + '" data-liv="' + esc(x[0]) + '"' + (S.catasto.livelli.indexOf(x[0]) !== -1 ? " checked" : "") +
+      '><span class="cat-ico" aria-hidden="true"></span><label class="nome" for="catL' + i + '">' + esc(x[1]) + "</label><span></span></div>";
+  }).join("");
+  document.querySelectorAll("#catLivelli [data-liv]").forEach(function (cb) {
+    cb.onchange = function () {
+      var id = cb.dataset.liv, l = S.catasto.livelli.filter(function (x) { return x !== id; });
+      if (cb.checked) l.push(id);
+      S.catasto.livelli = l;
+      if (cb.checked) S.catasto.on = true;
+      aggiornaCatasto();
+    };
+  });
+  var cbOn = document.getElementById("catOn");
+  cbOn.onclick = function (e) { e.stopPropagation(); };
+  cbOn.onchange = function () { S.catasto.on = cbOn.checked; aggiornaCatasto(); };
+  document.getElementById("catOpacita").oninput = function () {
+    S.catasto.opacita = +this.value;
+    if (lyCatasto) lyCatasto.setOpacity(S.catasto.opacita);
+    document.getElementById("catOpVal").textContent = Math.round(S.catasto.opacita * 100) + "%";
+  };
+  document.getElementById("catOpacita").onchange = function () { scriviLS("catasto", S.catasto); };
+  // tasto Catasto in coda ai tasti dello sfondo
+  var ctl = document.getElementById("ctlSfondo");
+  ctl.insertAdjacentHTML("beforeend", '<button type="button" data-cat="1" title="Velina catastale (Agenzia delle Entrate) sopra lo sfondo">Catasto</button>');
+  ctl.querySelector("[data-cat]").onclick = function () {
+    if (!S.catasto.livelli.length) S.catasto.livelli = ["CP.CadastralParcel"];
+    S.catasto.on = !(S.catasto.on && livelliCatasto().length);
+    aggiornaCatasto();
+    if (S.catasto.on && scalaCorrente() > CATASTO_SCALA * 1.6) info("Velina catastale accesa: avvicinati sotto 1:" + fmtN(CATASTO_SCALA) + " circa per vedere particelle e fabbricati");
+  };
+  map.on("zoomend", disegnaCatasto);
+})();
 
 // =====================================================================
 // SALVATAGGIO NEL BROWSER (IndexedDB): i layer importati restano
@@ -4704,12 +6332,13 @@ async function salvaDataset(tutti) {
 async function caricaDataset() {
   var indice = await idbOp("readonly", function (st) { return st.get("indice"); });
   if (!indice || !indice.gruppi || !indice.gruppi.length) return false;
+  S.aggiunte = (await idbOp("readonly", function (st) { return st.get("aggiunte"); }).catch(function () { return null; })) || {};
   var gruppi = [];
   for (var i = 0; i < indice.gruppi.length; i++) {
     var g = indice.gruppi[i], layers = [];
     for (var j = 0; j < g.uids.length; j++) {
       var d = await idbOp("readonly", function (st) { return st.get("layer:" + g.uids[j]); });
-      if (d) layers.push(nuovoLayer(d));
+      if (d) { var Ld = nuovoLayer(d); applicaAggiunte(Ld, S.aggiunte[Ld.uid]); layers.push(Ld); }
     }
     if (layers.length) gruppi.push({ nome: g.nome, layers: layers });
   }
@@ -4749,7 +6378,20 @@ function disegnaCartella() {
     h += '<p class="riep-pre">Ultima pre-analisi: ' + dp.toLocaleDateString("it-IT") + " " + dp.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" }) +
       ", " + fmtN(p.wr) + " WR da " + esc(p.file.join(", ")) + "</p>";
   }
+  if (c.montebello) {
+    var dm = new Date(c.montebello.quando);
+    h += '<p class="riep-pre">Ultima analisi Montebello: ' + dm.toLocaleDateString("it-IT") + " " + dm.toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" }) +
+      ", " + fmtN(c.montebello.ordini) + " ordini da " + esc(c.montebello.file) + "</p>";
+  }
+  var nAgg = contaAggiunte();
+  if (nAgg) {
+    h += '<p class="riep-pre">PTE aggiunte dal proforma: ' + fmtN(nAgg) + (c.proforma ? " (" + esc(c.proforma.file) + ")" : "") +
+      '. <button class="lnk" type="button" id="btnCsvAgg">Scarica CSV</button>' + (eMaster() ? ' <button class="lnk" type="button" id="btnTogliAgg">Togli</button>' : "") + "</p>";
+  }
   el.innerHTML = h;
+  var bca = document.getElementById("btnCsvAgg"), bta = document.getElementById("btnTogliAgg");
+  if (bca) bca.onclick = csvAggiunte;
+  if (bta) bta.onclick = function () { confermaDoppio(bta, togliAggiunte); };
   document.getElementById("btnDemo").hidden = !eMaster();
 }
 
@@ -4790,6 +6432,7 @@ document.getElementById("btnImpostazioni").onclick = function () { apriImpostazi
 document.getElementById("impChiudi").onclick = chiudiImpostazioni;
 map.setView([42.35, 14.2], 9);
 impostaSfondo(leggiLS("sfondo", "satellite"), true);
+aggiornaCatasto();
 statoCar.textContent = "Apertura dei dati salvati...";
 caricaDataset().catch(function () { return false; }).then(function (ok) {
   statoCar.textContent = "";
@@ -4805,7 +6448,9 @@ caricaDataset().catch(function () { return false; }).then(function (ok) {
 window.__AD = { S: S, cerca: cerca, parseRicercaIndirizzo: parseRicercaIndirizzo, punteggioNumeri: punteggioNumeri,
   civicoBarratoLayer: civicoBarratoLayer, normEgon: normEgon, normTxt: normTxt, abbinaComuni: abbinaComuni, map: map,
   scalaCorrente: scalaCorrente, caricaFile: caricaFile, CONFIG: function () { return CONFIG; }, entra: entra,
-  modifica: modifica, annullaOp: annullaOp, visibileFid: visibileFid };
+  modifica: modifica, annullaOp: annullaOp, visibileFid: visibileFid, analisiMontebello: analisiMontebello, mbEsporta: mbEsporta,
+  mbExcelSquadra: mbExcelSquadra, creaStructureMancanti: creaStructureMancanti, mbImpiantiPerSquadra: mbImpiantiPerSquadra,
+  dialogo: dialogo, aggiornaCatasto: aggiornaCatasto, xlsxConCelle: xlsxConCelle };
 })();
 
 </script>
